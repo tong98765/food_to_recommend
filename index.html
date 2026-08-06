@@ -12,7 +12,7 @@
 
     <style>
         /* ============================================================
-           全域樣式 (不變)
+           全域樣式
            ============================================================ */
         * {
             margin: 0;
@@ -706,7 +706,7 @@
         }
 
         /* ============================================================
-           手機版 (含全屏 Modal 與過濾欄動態高度)
+           手機版 (全屏 Modal + 動態高度)
            ============================================================ */
         @media (max-width: 768px) {
             .sidebar {
@@ -717,8 +717,8 @@
                 display: flex;
                 flex-direction: column;
                 height: calc(100dvh - 56px);
-                padding-bottom: 50dvh;
                 overflow: hidden;
+                padding: 0; /* 移除 padding，地圖填滿 */
             }
 
             .map-container {
@@ -784,7 +784,31 @@
                 border-color: #007DFF;
                 color: #007DFF;
             }
-            /* 其他色彩狀態略…(與之前相同) */
+            .mobile-filter-bar .filter-tag.high.active {
+                background: #FFEEF0;
+                border-color: #FF4757;
+                color: #FF4757;
+            }
+            .mobile-filter-bar .filter-tag.medium.active {
+                background: #FFF5E6;
+                border-color: #FFA502;
+                color: #FFA502;
+            }
+            .mobile-filter-bar .filter-tag.low.active {
+                background: #E8F9EF;
+                border-color: #2ED573;
+                color: #2ED573;
+            }
+            .mobile-filter-bar .filter-tag.star.active {
+                background: #FFF8E1;
+                border-color: #FFB800;
+                color: #FFB800;
+            }
+            .mobile-filter-bar .filter-tag.cuisine.active {
+                background: #EDE7F6;
+                border-color: #6C5CE7;
+                color: #6C5CE7;
+            }
 
             .locate-btn {
                 bottom: calc(50dvh + 20px);
@@ -802,24 +826,36 @@
 
             /* ---- 手機版全屏 Modal ---- */
             .modal-overlay {
-                align-items: flex-start;
-                justify-content: flex-start;
-                background: #FFFFFF;
-                backdrop-filter: none;
-                padding-top: 0;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: #FFFFFF !important;
+                backdrop-filter: none !important;
+                align-items: stretch !important;
+                justify-content: stretch !important;
+                padding: 0 !important;
+                display: flex !important;
+                z-index: 1000 !important;
+            }
+            .modal-overlay.open {
+                display: flex !important;
             }
             .modal {
-                max-width: 100%;
-                width: 100%;
-                height: 100%;
-                max-height: 100%;
-                border-radius: 0;
-                padding: 20px 18px 30px;
-                box-shadow: none;
-                animation: none;
-                overflow-y: auto;
-                display: flex;
-                flex-direction: column;
+                max-width: 100% !important;
+                width: 100% !important;
+                height: 100% !important;
+                max-height: 100% !important;
+                border-radius: 0 !important;
+                padding: 20px 18px 30px !important;
+                box-shadow: none !important;
+                animation: none !important;
+                overflow-y: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background: #FFFFFF !important;
+                margin: 0 !important;
             }
             .modal h2 {
                 font-size: 18px;
@@ -838,7 +874,6 @@
                 padding-top: 12px;
                 flex-shrink: 0;
             }
-            /* 關閉按鈕在手機版可調整為更明顯 */
             .modal .btn#closeAddBtn {
                 background: #F0F2F5;
                 color: #1A1A1A;
@@ -856,9 +891,6 @@
             .mobile-filter-bar .filter-tag {
                 font-size: 11px;
                 padding: 5px 0;
-            }
-            .app-body {
-                padding-bottom: 50dvh;
             }
             .locate-btn {
                 bottom: calc(50dvh + 16px);
@@ -1022,10 +1054,10 @@
                         </select>
                     </div>
                 </div>
-                <!-- 菜系下拉選單 -->
+                <!-- 品類下拉選單（僅固定選項） -->
                 <div class="form-group">
-                    <label>品類 (菜系)</label>
-                    <select id="fCuisine">
+                    <label>品類 (菜系) *</label>
+                    <select id="fCuisine" required>
                         <option value="">請選擇</option>
                         <option value="港式">港式</option>
                         <option value="中菜">中菜</option>
@@ -1038,11 +1070,7 @@
                         <option value="意大利菜">意大利菜</option>
                         <option value="法國菜">法國菜</option>
                         <option value="西餐">西餐</option>
-                        <option value="其他">其他 (請輸入)</option>
                     </select>
-                    <div id="customCuisineGroup" style="display:none; margin-top:6px;">
-                        <input type="text" id="fCustomCuisine" placeholder="請輸入自訂品類名稱" />
-                    </div>
                 </div>
                 <div class="form-group">
                     <label>地址 / 位置 *</label>
@@ -2140,9 +2168,7 @@
             const districtSelect = document.getElementById('fDistrict');
             const customDistrictGroup = document.getElementById('customDistrictGroup');
             const customDistrictInput = document.getElementById('fCustomDistrict');
-            const cuisineSelect = document.getElementById('fCuisine');
-            const customCuisineGroup = document.getElementById('customCuisineGroup');
-            const customCuisineInput = document.getElementById('fCustomCuisine');
+            // 品類欄位不再需要自訂
             const pwdInput = document.getElementById('fPassword');
             const pwdError = document.getElementById('pwdError');
 
@@ -2167,15 +2193,6 @@
                 }
             });
 
-            cuisineSelect.addEventListener('change', function() {
-                if (this.value === '其他') {
-                    customCuisineGroup.style.display = 'block';
-                    customCuisineInput.focus();
-                } else {
-                    customCuisineGroup.style.display = 'none';
-                }
-            });
-
             openBtn.addEventListener('click', () => {
                 modal.classList.add('open');
                 if (activeDistrict && activeDistrict !== 'other') {
@@ -2184,7 +2201,6 @@
                     districtSelect.value = '';
                 }
                 customDistrictGroup.style.display = 'none';
-                customCuisineGroup.style.display = 'none';
                 document.getElementById('fName').focus();
                 pwdInput.value = '';
                 pwdError.classList.remove('show');
@@ -2196,7 +2212,6 @@
                 pwdError.classList.remove('show');
                 pwdInput.value = '';
                 customDistrictGroup.style.display = 'none';
-                customCuisineGroup.style.display = 'none';
             });
 
             modal.addEventListener('click', (e) => {
@@ -2206,7 +2221,6 @@
                     pwdError.classList.remove('show');
                     pwdInput.value = '';
                     customDistrictGroup.style.display = 'none';
-                    customCuisineGroup.style.display = 'none';
                 }
             });
 
@@ -2226,6 +2240,7 @@
                 let district = document.getElementById('fDistrict').value;
                 const price = document.getElementById('fPrice').value;
                 const rating = parseInt(document.getElementById('fRating').value);
+                const cuisine = document.getElementById('fCuisine').value; // 直接取選中的值
                 const location = document.getElementById('fLocation').value.trim();
                 const phone = document.getElementById('fPhone').value.trim();
                 const hours = document.getElementById('fHours').value.trim();
@@ -2233,16 +2248,10 @@
                 const image = document.getElementById('fImage').value.trim();
                 const comment = document.getElementById('fComment').value.trim();
 
-                // 處理菜系
-                let cuisine = cuisineSelect.value;
-                if (cuisine === '其他') {
-                    const custom = customCuisineInput.value.trim();
-                    if (!custom) {
-                        alert('請輸入自訂品類名稱。');
-                        customCuisineInput.focus();
-                        return;
-                    }
-                    cuisine = custom;
+                if (!cuisine) {
+                    alert('請選擇品類');
+                    document.getElementById('fCuisine').focus();
+                    return;
                 }
 
                 if (district === 'other') {
@@ -2348,7 +2357,6 @@
                 restaurants.push(newRestaurant);
 
                 try {
-                    // 匿名登入並寫入
                     await signInAnonymously(auth);
                     const result = await saveRestaurants(restaurants);
                     await signOut(auth);
@@ -2359,7 +2367,6 @@
                         pwdError.classList.remove('show');
                         pwdInput.value = '';
                         customDistrictGroup.style.display = 'none';
-                        customCuisineGroup.style.display = 'none';
 
                         if (DISTRICTS.includes(district)) {
                             activeDistrict = district;
