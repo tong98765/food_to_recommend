@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>香港餐廳地圖 - 18區美食指南</title>
+    <title>HW 飲食地圖 - 18區美食指南</title>
 
     <!-- ===== Leaflet CSS & JS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -12,8 +12,8 @@
 
     <style>
         /* ============================================================
-                   HarmonyOS Design System + 手機優化
-                   ============================================================ */
+           完整樣式 (同前，為節省篇幅此處省略，請保留原有的完整樣式)
+           ============================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -22,23 +22,22 @@
 
         body {
             font-family: -apple-system, "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #F7F9FA;
+            background: #F5F6F8;
             color: #1A1A1A;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* ---------- 頂部導航 ---------- */
         .app-header {
             height: 56px;
             background: #FFFFFF;
-            border-bottom: 1px solid #E8ECF0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
             position: relative;
-            z-index: 20;
+            z-index: 30;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
         .app-header .logo {
@@ -48,6 +47,7 @@
             font-size: 18px;
             font-weight: 700;
             color: #1A1A1A;
+            letter-spacing: -0.3px;
         }
         .app-header .logo span {
             color: #007DFF;
@@ -57,30 +57,20 @@
             align-items: center;
             gap: 8px;
         }
-        .hamburger {
-            display: none;
-            font-size: 24px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px 8px;
-            color: #1A1A1A;
-        }
 
-        /* ---------- 按鈕 ---------- */
         .btn {
             padding: 6px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            background: #F1F3F5;
+            background: #F0F2F5;
             color: #1A1A1A;
         }
         .btn:hover {
-            background: #E8ECF0;
+            background: #E5E8EC;
         }
         .btn-primary {
             background: #007DFF;
@@ -100,116 +90,150 @@
             padding: 4px 12px;
             font-size: 12px;
         }
+        .btn-edit {
+            background: #FFB800;
+            color: #fff;
+            padding: 2px 10px;
+            font-size: 11px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-edit:hover {
+            background: #E6A500;
+        }
 
-        /* ---------- 主佈局 ---------- */
         .app-body {
             display: flex;
             height: calc(100vh - 56px);
             position: relative;
         }
 
-        /* ---------- 側邊欄 (可收合) ---------- */
         .sidebar {
-            width: 320px;
-            min-width: 320px;
+            width: 340px;
+            min-width: 340px;
             background: #FFFFFF;
-            border-right: 1px solid #E8ECF0;
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: transform 0.3s ease;
-            z-index: 15;
+            z-index: 20;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
         }
+
+        .sidebar-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0 12px 0;
+        }
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #D0D7DE;
+            border-radius: 4px;
+        }
+
         .sidebar-section {
-            padding: 12px 16px 10px;
+            padding: 14px 18px 10px;
             border-bottom: 1px solid #F1F3F5;
         }
+        .sidebar-section:last-of-type {
+            border-bottom: none;
+        }
         .sidebar-section h3 {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            color: #6B7A8A;
+            color: #8A9AA8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             margin-bottom: 8px;
         }
 
-        /* 地區標籤 */
         .district-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 5px;
-            max-height: 140px;
+            max-height: 126px;
             overflow-y: auto;
-            padding-right: 4px;
+            padding-right: 2px;
         }
         .district-grid::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         .district-grid::-webkit-scrollbar-thumb {
             background: #D0D7DE;
             border-radius: 4px;
         }
         .district-tag {
-            padding: 4px 0;
+            padding: 7px 0;
             text-align: center;
             font-size: 12px;
-            border-radius: 8px;
-            background: #F7F9FA;
+            font-weight: 500;
+            border-radius: 10px;
+            background: #F5F6F8;
             color: #4A5A6A;
             cursor: pointer;
-            transition: all 0.15s;
-            border: 1px solid transparent;
+            transition: all 0.2s;
+            border: 1.5px solid transparent;
             user-select: none;
+            line-height: 1.3;
         }
         .district-tag:hover {
-            background: #E8F0FE;
+            background: #EDF2FA;
             color: #007DFF;
-            border-color: #007DFF;
+            border-color: rgba(0, 125, 255, 0.2);
         }
         .district-tag.active {
             background: #007DFF;
             color: #fff;
             border-color: #007DFF;
+            box-shadow: 0 2px 8px rgba(0, 125, 255, 0.25);
         }
 
-        /* 價格 & 星級 & 品類過濾 */
         .filter-group {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 6px;
-            margin-top: 4px;
         }
         .filter-tag {
-            padding: 3px 12px;
+            padding: 6px 0;
+            text-align: center;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.15s;
-            background: #F7F9FA;
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+            background: #F5F6F8;
             color: #4A5A6A;
+            line-height: 1.4;
         }
         .filter-tag:hover {
-            transform: scale(1.03);
+            transform: scale(1.02);
+            background: #EDF2FA;
         }
         .filter-tag.active {
             border-color: #007DFF;
-            background: #E8F0FE;
+            background: #EEF4FE;
+            color: #007DFF;
+            box-shadow: 0 2px 6px rgba(0, 125, 255, 0.10);
         }
         .filter-tag.high {
             color: #FF4757;
         }
         .filter-tag.high.active {
-            background: #FFE8EA;
+            background: #FFEEF0;
             border-color: #FF4757;
+            color: #FF4757;
         }
         .filter-tag.medium {
             color: #FFA502;
         }
         .filter-tag.medium.active {
-            background: #FFF3E0;
+            background: #FFF5E6;
             border-color: #FFA502;
+            color: #FFA502;
         }
         .filter-tag.low {
             color: #2ED573;
@@ -217,6 +241,7 @@
         .filter-tag.low.active {
             background: #E8F9EF;
             border-color: #2ED573;
+            color: #2ED573;
         }
         .filter-tag.star {
             color: #FFB800;
@@ -224,6 +249,7 @@
         .filter-tag.star.active {
             background: #FFF8E1;
             border-color: #FFB800;
+            color: #FFB800;
         }
         .filter-tag.cuisine {
             color: #6C5CE7;
@@ -231,13 +257,16 @@
         .filter-tag.cuisine.active {
             background: #EDE7F6;
             border-color: #6C5CE7;
+            color: #6C5CE7;
         }
 
-        /* 餐廳列表 */
         .restaurant-list {
-            flex: 1;
+            flex: 0 0 28%;
             overflow-y: auto;
-            padding: 10px 16px 20px;
+            padding: 10px 16px 14px;
+            border-top: 1px solid #F1F3F5;
+            background: #FAFBFC;
+            min-height: 120px;
         }
         .restaurant-list::-webkit-scrollbar {
             width: 4px;
@@ -250,36 +279,38 @@
         .restaurant-card {
             background: #FFFFFF;
             border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 8px;
+            padding: 10px 14px;
+            margin-bottom: 6px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid #F1F3F5;
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
         }
         .restaurant-card:hover {
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             transform: translateY(-1px);
         }
         .restaurant-card .name {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #1A1A1A;
+            letter-spacing: -0.2px;
         }
         .restaurant-card .meta {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 4px;
-            font-size: 13px;
+            gap: 6px;
+            margin-top: 3px;
+            font-size: 12px;
             color: #6B7A8A;
             flex-wrap: wrap;
         }
         .restaurant-card .price-badge {
             display: inline-block;
-            padding: 1px 10px;
+            padding: 1px 8px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
         }
         .price-badge.high {
@@ -296,38 +327,45 @@
         }
         .restaurant-card .stars {
             color: #FFB800;
-            font-size: 14px;
-            letter-spacing: 1px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
         }
         .restaurant-card .district-label {
-            font-size: 12px;
+            font-size: 10px;
             color: #8A9AA8;
-            background: #F7F9FA;
+            background: #F0F2F5;
             padding: 1px 8px;
             border-radius: 12px;
         }
         .restaurant-card .comment-preview {
-            font-size: 13px;
+            font-size: 12px;
             color: #6B7A8A;
-            margin-top: 4px;
+            margin-top: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .restaurant-card .cuisine-type {
-            font-size: 12px;
+            font-size: 10px;
             color: #8A9AA8;
             background: #F0F2F5;
             padding: 1px 8px;
             border-radius: 12px;
         }
         .restaurant-card .recommender {
-            font-size: 12px;
+            font-size: 11px;
             color: #8A9AA8;
             margin-top: 2px;
         }
+        .restaurant-card .card-actions {
+            margin-top: 6px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            border-top: 1px solid #F1F3F5;
+            padding-top: 6px;
+        }
 
-        /* ---------- 地圖容器 ---------- */
         .map-container {
             flex: 1;
             position: relative;
@@ -338,7 +376,6 @@
             height: 100%;
         }
 
-        /* ---------- 浮動定位按鈕 ---------- */
         .locate-btn {
             position: absolute;
             bottom: 30px;
@@ -349,8 +386,8 @@
             border-radius: 50%;
             width: 48px;
             height: 48px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-            font-size: 22px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+            font-size: 20px;
             color: #007DFF;
             cursor: pointer;
             display: flex;
@@ -365,13 +402,52 @@
         .locate-btn:active {
             transform: scale(0.95);
         }
+        .locate-btn.loading {
+            animation: pulse 1.2s ease-in-out infinite;
+            color: #FFA502;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 0 12px rgba(255, 165, 2, 0);
+            }
+        }
 
-        /* ---------- Leaflet 彈窗樣式 ---------- */
+        .locate-status {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            z-index: 500;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+        .locate-status.show {
+            opacity: 1;
+        }
+        .locate-status.error {
+            background: rgba(255, 71, 87, 0.9);
+        }
+        .locate-status.success {
+            background: rgba(46, 213, 115, 0.9);
+        }
+
         .leaflet-popup-content {
             font-family: inherit;
             font-size: 14px;
             line-height: 1.5;
-            min-width: 200px;
+            min-width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .leaflet-popup-content .iw-name {
             font-size: 17px;
@@ -398,7 +474,7 @@
         .leaflet-popup-content .iw-comment {
             font-size: 13px;
             color: #4A5A6A;
-            background: #F7F9FA;
+            background: #F5F6F8;
             padding: 6px 10px;
             border-radius: 8px;
             margin-top: 4px;
@@ -428,7 +504,89 @@
             color: #2ED573;
         }
 
-        /* ---------- 模態框 ---------- */
+        .iw-comments {
+            margin-top: 12px;
+            border-top: 1px solid #E8ECF0;
+            padding-top: 10px;
+        }
+        .iw-comments .comment-item {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            border-left: 3px solid #007DFF;
+        }
+        .iw-comments .comment-item .comment-text {
+            color: #1A1A1A;
+        }
+        .iw-comments .comment-item .comment-meta {
+            font-size: 11px;
+            color: #8A9AA8;
+            margin-top: 2px;
+        }
+        .iw-comments .comment-item .comment-meta .rec {
+            background: #E8ECF0;
+            padding: 0 6px;
+            border-radius: 4px;
+        }
+        .iw-comment-form {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #D0D7DE;
+        }
+        .iw-comment-form textarea {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #D0D7DE;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+        .iw-comment-form input[type="text"],
+        .iw-comment-form input[type="password"] {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #D0D7DE;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            margin-bottom: 4px;
+        }
+        .iw-comment-form .form-row {
+            display: flex;
+            gap: 6px;
+        }
+        .iw-comment-form .form-row input {
+            flex: 1;
+        }
+        .iw-comment-form .btn-submit {
+            background: #007DFF;
+            color: #fff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .iw-comment-form .btn-submit:hover {
+            background: #0066CC;
+        }
+        .iw-comment-form .comment-error {
+            color: #FF4757;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .iw-comment-form .comment-success {
+            color: #2ED573;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -449,7 +607,7 @@
             background: #FFFFFF;
             border-radius: 16px;
             padding: 28px 24px 32px;
-            max-width: 480px;
+            max-width: 500px;
             width: 92%;
             max-height: 90vh;
             overflow-y: auto;
@@ -535,78 +693,150 @@
             display: none;
         }
 
-        /* ---------- 手機響應式 ---------- */
         @media (max-width: 768px) {
-            .hamburger {
-                display: block;
-            }
             .sidebar {
-                position: fixed;
-                top: 56px;
-                left: 0;
-                width: 300px;
-                height: calc(100vh - 56px);
-                transform: translateX(-105%);
-                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
-                border-right: none;
-                z-index: 30;
-                background: #FFFFFF;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-backdrop {
-                display: none;
-                position: fixed;
-                top: 56px;
-                left: 0;
-                width: 100%;
-                height: calc(100vh - 56px);
-                background: rgba(0, 0, 0, 0.3);
-                z-index: 25;
-            }
-            .sidebar-backdrop.active {
-                display: block;
+                display: none !important;
             }
             .app-body {
                 flex-direction: column;
                 height: calc(100vh - 56px);
+                padding-bottom: 50vh;
             }
             .map-container {
                 height: 100%;
                 width: 100%;
             }
-            .district-grid {
-                grid-template-columns: 1fr 1fr 1fr 1fr;
+            .mobile-filter-bar {
+                display: block !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 50vh;
+                max-height: none;
+                overflow-y: auto;
+                background: #FFFFFF;
+                border-top: 1px solid rgba(0, 0, 0, 0.06);
+                padding: 8px 12px 12px;
+                z-index: 50;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .mobile-filter-bar .filter-label {
+                font-size: 12px;
+                font-weight: 600;
+                color: #8A9AA8;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 4px 0 4px 2px;
+            }
+            .mobile-filter-bar .filter-row {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+                margin-bottom: 6px;
+            }
+            .mobile-filter-bar .filter-row.price-row,
+            .mobile-filter-bar .filter-row.star-row,
+            .mobile-filter-bar .filter-row.cuisine-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .mobile-filter-bar .filter-tag {
+                padding: 6px 0;
+                font-size: 12px;
+                border-radius: 16px;
+                background: #F5F6F8;
+                border: 1.5px solid transparent;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.15s;
+                user-select: none;
+                font-weight: 500;
+            }
+            .mobile-filter-bar .filter-tag.active {
+                background: #EEF4FE;
+                border-color: #007DFF;
+                color: #007DFF;
+            }
+            .mobile-filter-bar .filter-tag.high.active {
+                background: #FFEEF0;
+                border-color: #FF4757;
+                color: #FF4757;
+            }
+            .mobile-filter-bar .filter-tag.medium.active {
+                background: #FFF5E6;
+                border-color: #FFA502;
+                color: #FFA502;
+            }
+            .mobile-filter-bar .filter-tag.low.active {
+                background: #E8F9EF;
+                border-color: #2ED573;
+                color: #2ED573;
+            }
+            .mobile-filter-bar .filter-tag.star.active {
+                background: #FFF8E1;
+                border-color: #FFB800;
+                color: #FFB800;
+            }
+            .mobile-filter-bar .filter-tag.cuisine.active {
+                background: #EDE7F6;
+                border-color: #6C5CE7;
+                color: #6C5CE7;
+            }
+            .locate-btn {
+                bottom: calc(50vh + 20px);
+                right: 16px;
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .locate-status {
+                bottom: calc(50vh + 80px);
+                right: 16px;
+                font-size: 13px;
+                padding: 6px 16px;
             }
             .modal {
-                padding: 20px;
+                padding: 16px;
             }
             .modal .form-row {
                 flex-direction: column;
                 gap: 0;
             }
-            .locate-btn {
-                bottom: 20px;
-                right: 16px;
-                width: 52px;
-                height: 52px;
-                font-size: 24px;
-            }
         }
+
         @media (max-width: 480px) {
-            .district-grid {
-                grid-template-columns: 1fr 1fr 1fr;
+            .mobile-filter-bar .filter-row {
+                gap: 4px;
             }
-            .app-header .logo {
-                font-size: 15px;
+            .mobile-filter-bar .filter-tag {
+                font-size: 11px;
+                padding: 5px 0;
             }
-            .header-actions .btn span {
-                display: none;
+            .app-body {
+                padding-bottom: 50vh;
+            }
+            .locate-btn {
+                bottom: calc(50vh + 16px);
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+            .locate-status {
+                bottom: calc(50vh + 70px);
+                font-size: 11px;
+                padding: 4px 12px;
             }
         }
 
-        /* 工具 */
+        @media (min-width: 769px) {
+            .mobile-filter-bar {
+                display: none !important;
+            }
+            .app-body {
+                padding-bottom: 0;
+            }
+        }
+
         .text-muted {
             color: #8A9AA8;
             font-size: 13px;
@@ -621,70 +851,77 @@
 
     <!-- ===== 主應用 ===== -->
     <div id="app">
-        <!-- 頂部導航 -->
         <header class="app-header">
-            <div style="display:flex;align-items:center;gap:6px;">
-                <button class="hamburger" id="hamburgerBtn">☰</button>
-                <div class="logo">🍜 <span>食在地圖</span></div>
-            </div>
+            <div class="logo">🍜 <span>HW 飲食地圖</span></div>
             <div class="header-actions">
                 <button class="btn btn-primary btn-sm" id="openAddBtn">＋ 新增</button>
             </div>
         </header>
 
         <div class="app-body">
-            <!-- 側邊欄遮罩 (手機) -->
-            <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
-            <!-- 側邊欄 -->
             <aside class="sidebar" id="sidebar">
-                <!-- 地區 -->
-                <div class="sidebar-section">
-                    <h3>🏙️ 地區 · 點擊切換</h3>
-                    <div class="district-grid" id="districtGrid"></div>
-                </div>
-
-                <!-- 價格 -->
-                <div class="sidebar-section">
-                    <h3>💰 價格等級</h3>
-                    <div class="filter-group" id="priceFilter">
-                        <span class="filter-tag active" data-price="all">全部</span>
-                        <span class="filter-tag high" data-price="high">高 &gt;$800</span>
-                        <span class="filter-tag medium" data-price="medium">中 &gt;$300</span>
-                        <span class="filter-tag low" data-price="low">低 &lt;$300</span>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-section">
+                        <h3>🏙️ 地區</h3>
+                        <div class="district-grid" id="districtGrid"></div>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>💰 價格</h3>
+                        <div class="filter-group" id="priceFilter">
+                            <span class="filter-tag active" data-price="all">全部</span>
+                            <span class="filter-tag high" data-price="high">高 &gt;$800</span>
+                            <span class="filter-tag medium" data-price="medium">中 &gt;$300</span>
+                            <span class="filter-tag low" data-price="low">低 &lt;$300</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>⭐ 星級</h3>
+                        <div class="filter-group" id="starFilter">
+                            <span class="filter-tag star active" data-stars="all">全部</span>
+                            <span class="filter-tag star" data-stars="1">★ 1星</span>
+                            <span class="filter-tag star" data-stars="2">★★ 2星</span>
+                            <span class="filter-tag star" data-stars="3">★★★ 3星</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>🍽️ 品類</h3>
+                        <div class="filter-group" id="cuisineFilter">
+                            <span class="filter-tag cuisine active" data-cuisine="all">全部</span>
+                        </div>
                     </div>
                 </div>
-
-                <!-- 星級 -->
-                <div class="sidebar-section">
-                    <h3>⭐ 星級篩選</h3>
-                    <div class="filter-group" id="starFilter">
-                        <span class="filter-tag star active" data-stars="all">全部</span>
-                        <span class="filter-tag star" data-stars="1">★ (1星)</span>
-                        <span class="filter-tag star" data-stars="2">★★ (2星)</span>
-                        <span class="filter-tag star" data-stars="3">★★★ (3星)</span>
-                    </div>
-                </div>
-
-                <!-- 品類 (菜系) -->
-                <div class="sidebar-section">
-                    <h3>🍽️ 品類</h3>
-                    <div class="filter-group" id="cuisineFilter">
-                        <span class="filter-tag cuisine active" data-cuisine="all">全部</span>
-                        <!-- 動態生成 -->
-                    </div>
-                </div>
-
-                <!-- 餐廳列表 -->
                 <div class="restaurant-list" id="restaurantList">
-                    <div class="text-muted" style="text-align:center;padding:30px 0;">載入餐廳中...</div>
+                    <div class="text-muted" style="text-align:center;padding:16px 0;">載入餐廳中...</div>
                 </div>
             </aside>
 
-            <!-- 地圖 -->
             <div class="map-container">
                 <div id="map"></div>
+                <div class="locate-status" id="locateStatus">📍 定位中...</div>
                 <button class="locate-btn" id="locateBtn" title="定位到我">📍</button>
+            </div>
+
+            <div class="mobile-filter-bar" id="mobileFilterBar">
+                <div class="filter-label">🏙️ 地區</div>
+                <div class="filter-row district-row" id="mobileDistrictFilter"></div>
+                <div class="filter-label">💰 價格</div>
+                <div class="filter-row price-row" id="mobilePriceFilter">
+                    <span class="filter-tag active" data-price="all">全部</span>
+                    <span class="filter-tag high" data-price="high">高</span>
+                    <span class="filter-tag medium" data-price="medium">中</span>
+                    <span class="filter-tag low" data-price="low">低</span>
+                </div>
+                <div class="filter-label">⭐ 星級</div>
+                <div class="filter-row star-row" id="mobileStarFilter">
+                    <span class="filter-tag star active" data-stars="all">全部</span>
+                    <span class="filter-tag star" data-stars="1">★1</span>
+                    <span class="filter-tag star" data-stars="2">★★2</span>
+                    <span class="filter-tag star" data-stars="3">★★★3</span>
+                </div>
+                <div class="filter-label">🍽️ 品類</div>
+                <div class="filter-row cuisine-row" id="mobileCuisineFilter">
+                    <span class="filter-tag cuisine active" data-cuisine="all">全部</span>
+                </div>
             </div>
         </div>
     </div>
@@ -708,7 +945,6 @@
                         <label>地區 *</label>
                         <select id="fDistrict" required>
                             <option value="">請選擇</option>
-                            <!-- 18區由 JS 填入，另加 "其他" 選項 -->
                         </select>
                     </div>
                     <div class="form-group" id="customDistrictGroup" style="display:none;">
@@ -736,7 +972,24 @@
                 </div>
                 <div class="form-group">
                     <label>品類 (菜系)</label>
-                    <input type="text" id="fCuisine" placeholder="粵菜、日式..." />
+                    <select id="fCuisine">
+                        <option value="">請選擇</option>
+                        <option value="港式">港式</option>
+                        <option value="中菜">中菜</option>
+                        <option value="粵菜">粵菜</option>
+                        <option value="台灣菜">台灣菜</option>
+                        <option value="日本菜">日本菜</option>
+                        <option value="韓國菜">韓國菜</option>
+                        <option value="泰國菜">泰國菜</option>
+                        <option value="亞洲菜">亞洲菜</option>
+                        <option value="意大利菜">意大利菜</option>
+                        <option value="法國菜">法國菜</option>
+                        <option value="西餐">西餐</option>
+                        <option value="其他">其他 (請輸入)</option>
+                    </select>
+                    <div id="customCuisineGroup" style="display:none; margin-top:6px;">
+                        <input type="text" id="fCustomCuisine" placeholder="請輸入自訂品類名稱" />
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>地址 / 位置 *</label>
@@ -772,11 +1025,62 @@
 
 
     <!-- ============================================================
-    JavaScript
+    JavaScript (ES Module 版本 - 已修復)
     ============================================================ -->
-    <script>
+    <script type="module">
         // =============================================================
-        // 1. 安全輔助函數 (同前)
+        // 1. 匯入 Firebase 模組 (已修正)
+        // =============================================================
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            orderBy,
+            getDocs,
+            doc,
+            setDoc,
+            deleteDoc,
+            writeBatch,
+            initializeFirestore,
+            persistentLocalCache
+        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+        // =============================================================
+        // 2. Firebase 初始化
+        // =============================================================
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyADWqMk-LE1zPC7IgKkgZuf6i4kAhhWSS0",
+            authDomain: "foodie-91f60.firebaseapp.com",
+            projectId: "foodie-91f60",
+            storageBucket: "foodie-91f60.firebasestorage.app",
+            messagingSenderId: "1086791871060",
+            appId: "1:1086791871060:web:6b0e7b0f7c31bfa7f5dbc1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        // 使用 initializeFirestore 並啟用本地快取 (替代 enablePersistence)
+        const db = initializeFirestore(app, {
+            localCache: persistentLocalCache({ /* 可選設定 */ })
+        });
+
+        const auth = getAuth(app);
+
+        console.log('✅ Firebase 已初始化 (Firestore v12)');
+        console.log('📌 使用 persistentLocalCache 啟用離線支援');
+
+        const RESTAURANTS_COLLECTION = 'restaurants';
+
+        // =============================================================
+        // 3. 安全輔助函數
         // =============================================================
 
         function escapeHtml(text) {
@@ -810,10 +1114,10 @@
         }
 
         // =============================================================
-        // 2. 設定
+        // 4. 設定
         // =============================================================
 
-        const STATIC_PASSWORD = 'hkfood2026';
+        const STATIC_PASSWORD = 'huawei';
 
         const DISTRICTS = [
             '中西區', '灣仔區', '東區', '南區',
@@ -831,7 +1135,7 @@
         ];
 
         // =============================================================
-        // 3. 初始範例資料 (含 recommender)
+        // 5. 預設範例資料
         // =============================================================
 
         function convertRating(oldRating) {
@@ -840,12 +1144,12 @@
             return 1;
         }
 
-        const RAW_DEFAULT = [{
+        const DEFAULT_RESTAURANTS = [{
             id: 'r1',
             name: '龍景軒',
             district: '中西區',
             price: 'high',
-            rating: 5,
+            rating: 3,
             cuisine: '粵菜',
             location: '中環金融街8號四季酒店4樓',
             phone: '+852 3196 8888',
@@ -854,28 +1158,16 @@
             comment: '米其林三星，維港景觀絕佳，點心精緻。',
             recommender: '美食家 A',
             lat: 22.2871,
-            lng: 114.1586
+            lng: 114.1586,
+            comments: [
+                { text: '非常棒的體驗，服務一流！', timestamp: '2026-08-01 14:30', recommender: '陳先生' }
+            ]
         }, {
             id: 'r2',
-            name: '大班樓',
-            district: '中西區',
-            price: 'high',
-            rating: 4,
-            cuisine: '粵菜',
-            location: '中環九如坊18號',
-            phone: '+852 2555 2202',
-            hours: '12:00-15:00, 18:30-23:00',
-            image: '',
-            comment: '傳統粵菜，招牌話梅肉桂糖醋排骨。',
-            recommender: '',
-            lat: 22.2847,
-            lng: 114.1554
-        }, {
-            id: 'r3',
             name: '添好運 (深水埗)',
             district: '深水埗區',
             price: 'low',
-            rating: 4,
+            rating: 3,
             cuisine: '粵菜點心',
             location: '深水埗福榮街9-11號地下',
             phone: '+852 2788 1226',
@@ -884,13 +1176,16 @@
             comment: '米其林一星，平民價格，酥皮叉燒包必點。',
             recommender: '陳小明',
             lat: 22.3312,
-            lng: 114.1628
+            lng: 114.1628,
+            comments: [
+                { text: '每次去都要排隊，但值得！', timestamp: '2026-07-30 12:20', recommender: '張太' }
+            ]
         }, {
-            id: 'r4',
+            id: 'r3',
             name: '一樂燒鵝',
             district: '中西區',
             price: 'medium',
-            rating: 4,
+            rating: 3,
             cuisine: '燒味',
             location: '中環士丹利街34-38號地舖',
             phone: '+852 2524 3888',
@@ -899,13 +1194,14 @@
             comment: '馳名燒鵝，皮脆肉嫩，米其林推薦。',
             recommender: '',
             lat: 22.2829,
-            lng: 114.1579
+            lng: 114.1579,
+            comments: []
         }, {
-            id: 'r5',
+            id: 'r4',
             name: '甘牌燒鵝',
             district: '灣仔區',
             price: 'medium',
-            rating: 4,
+            rating: 3,
             cuisine: '燒味',
             location: '灣仔軒尼詩道226號地下',
             phone: '+852 2520 1110',
@@ -914,13 +1210,14 @@
             comment: '連續多年米其林一星，燒鵝肥美多汁。',
             recommender: '張先生',
             lat: 22.2783,
-            lng: 114.1779
+            lng: 114.1779,
+            comments: []
         }, {
-            id: 'r6',
+            id: 'r5',
             name: '九記牛腩',
             district: '中西區',
             price: 'low',
-            rating: 4,
+            rating: 3,
             cuisine: '港式',
             location: '中環歌賦街21號地舖',
             phone: '+852 2850 5962',
@@ -929,13 +1226,14 @@
             comment: '清湯牛腩伊麵，湯頭濃郁，老字號。',
             recommender: '',
             lat: 22.2853,
-            lng: 114.1547
+            lng: 114.1547,
+            comments: []
         }, {
-            id: 'r7',
+            id: 'r6',
             name: '澳洲牛奶公司',
             district: '油尖旺區',
             price: 'low',
-            rating: 4,
+            rating: 3,
             cuisine: '港式茶餐廳',
             location: '佐敦白加士街47-49號地下',
             phone: '+852 2730 1356',
@@ -944,13 +1242,14 @@
             comment: '燉奶、炒蛋多士，地道港式早餐。',
             recommender: '李太',
             lat: 22.3054,
-            lng: 114.1714
+            lng: 114.1714,
+            comments: []
         }, {
-            id: 'r8',
+            id: 'r7',
             name: '鏞記酒家',
             district: '中西區',
             price: 'high',
-            rating: 4,
+            rating: 3,
             cuisine: '粵菜',
             location: '中環威靈頓街32-40號',
             phone: '+852 2522 1624',
@@ -959,13 +1258,14 @@
             comment: '燒鵝、蜜汁叉燒，經典老牌粵菜。',
             recommender: '',
             lat: 22.2837,
-            lng: 114.1570
+            lng: 114.1570,
+            comments: []
         }, {
-            id: 'r9',
+            id: 'r8',
             name: '蓮香樓',
             district: '中西區',
             price: 'low',
-            rating: 3,
+            rating: 2,
             cuisine: '粵菜點心',
             location: '中環威靈頓街160-164號',
             phone: '+852 2544 4556',
@@ -974,13 +1274,14 @@
             comment: '懷舊茶樓，推車點心，充滿老香港風情。',
             recommender: '',
             lat: 22.2844,
-            lng: 114.1543
+            lng: 114.1543,
+            comments: []
         }, {
-            id: 'r10',
+            id: 'r9',
             name: '阿甘蝦餐廳',
             district: '南區',
             price: 'medium',
-            rating: 3,
+            rating: 2,
             cuisine: '美式海鮮',
             location: '香港仔海傍道8號',
             phone: '+852 2552 8866',
@@ -989,56 +1290,142 @@
             comment: '海景餐廳，招牌蝦料理，氣氛輕鬆。',
             recommender: '食客王',
             lat: 22.2483,
-            lng: 114.1535
+            lng: 114.1535,
+            comments: []
+        }, {
+            id: 'r10',
+            name: '大班樓',
+            district: '中西區',
+            price: 'high',
+            rating: 3,
+            cuisine: '粵菜',
+            location: '中環九如坊18號',
+            phone: '+852 2555 2202',
+            hours: '12:00-15:00, 18:30-23:00',
+            image: '',
+            comment: '傳統粵菜，招牌話梅肉桂糖醋排骨。',
+            recommender: '',
+            lat: 22.2847,
+            lng: 114.1554,
+            comments: []
         }];
 
-        const DEFAULT_RESTAURANTS = RAW_DEFAULT.map(r => ({
-            ...r,
-            rating: convertRating(r.rating),
-            recommender: r.recommender || ''
-        }));
-
         // =============================================================
-        // 4. 狀態管理 (含自動轉換舊資料)
+        // 6. 資料操作 (Firestore 模組化)
         // =============================================================
 
-        function loadRestaurants() {
-            let stored = localStorage.getItem('hk_restaurants');
-            let data;
-            if (stored) {
-                try {
-                    data = JSON.parse(stored);
-                    data = data.map(r => {
-                        if (r.rating > 3) r.rating = convertRating(r.rating);
-                        if (!r.hasOwnProperty('recommender')) r.recommender = '';
-                        return r;
-                    });
-                } catch (e) {
-                    data = DEFAULT_RESTAURANTS;
+        async function loadRestaurants() {
+            try {
+                const q = query(
+                    collection(db, RESTAURANTS_COLLECTION),
+                    orderBy('name')
+                );
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    await seedDefaultData();
+                    return loadRestaurants();
                 }
-            } else {
-                data = DEFAULT_RESTAURANTS;
+
+                const data = [];
+                snapshot.forEach(doc => {
+                    const raw = doc.data();
+                    if (raw.rating > 3) raw.rating = convertRating(raw.rating);
+                    if (!raw.hasOwnProperty('recommender')) raw.recommender = '';
+                    if (!raw.hasOwnProperty('comments') || !Array.isArray(raw.comments)) raw.comments = [];
+                    data.push(raw);
+                });
+
+                localStorage.setItem('hk_restaurants', JSON.stringify(data));
+                return data;
+            } catch (error) {
+                console.error('讀取 Firebase 失敗:', error);
+                const cached = localStorage.getItem('hk_restaurants');
+                if (cached) {
+                    try { return JSON.parse(cached); } catch (e) {}
+                }
+                return DEFAULT_RESTAURANTS;
             }
-            localStorage.setItem('hk_restaurants', JSON.stringify(data));
-            return data;
         }
 
-        function saveRestaurants(data) {
-            localStorage.setItem('hk_restaurants', JSON.stringify(data));
+        async function saveRestaurants(data) {
+            try {
+                // 刪除所有現有文件
+                const snapshot = await getDocs(collection(db, RESTAURANTS_COLLECTION));
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+
+                // 重新寫入所有餐廳
+                const writeBatch2 = writeBatch(db);
+                data.forEach(restaurant => {
+                    const docRef = doc(collection(db, RESTAURANTS_COLLECTION));
+                    writeBatch2.set(docRef, restaurant);
+                });
+                await writeBatch2.commit();
+
+                localStorage.setItem('hk_restaurants', JSON.stringify(data));
+                console.log('✅ 資料已同步至 Firebase');
+                return true;
+            } catch (error) {
+                console.error('儲存至 Firebase 失敗:', error);
+                localStorage.setItem('hk_restaurants', JSON.stringify(data));
+                alert('⚠️ 雲端儲存失敗，資料已儲存於本地快取。請稍後再試。');
+                return false;
+            }
         }
 
-        let restaurants = loadRestaurants();
+        async function seedDefaultData() {
+            try {
+                const batch = writeBatch(db);
+                DEFAULT_RESTAURANTS.forEach(restaurant => {
+                    const docRef = doc(collection(db, RESTAURANTS_COLLECTION));
+                    batch.set(docRef, restaurant);
+                });
+                await batch.commit();
+                console.log('✅ 預設範例資料已寫入 Firebase');
+                localStorage.setItem('hk_restaurants', JSON.stringify(DEFAULT_RESTAURANTS));
+            } catch (error) {
+                console.error('寫入預設資料失敗:', error);
+            }
+        }
+
+        // =============================================================
+        // 7. 認證與寫入輔助
+        // =============================================================
+
+        async function authenticateAndWrite(data) {
+            try {
+                await signInAnonymously(auth);
+                const result = await saveRestaurants(data);
+                await signOut(auth);
+                return result;
+            } catch (error) {
+                console.error('認證或寫入失敗:', error);
+                alert('⚠️ 儲存失敗，請檢查網路連線');
+                return false;
+            }
+        }
+
+        // =============================================================
+        // 8. 狀態變數
+        // =============================================================
+
+        let restaurants = [];
         let map = null;
         let markersLayer = null;
         let userMarker = null;
-        let activeDistrict = null; // null 或 'other' 或具體區域名
+        let activeDistrict = null;
         let activePrice = 'all';
         let activeStars = 'all';
-        let activeCuisine = 'all'; // 新增品類篩選
-        let nextId = restaurants.reduce((max, r) => Math.max(max, parseInt(r.id.replace('r', '')) || 0), 0) + 1;
+        let activeCuisine = 'all';
+        let currentPopupRestaurantId = null;
+        let focusCommentOnOpen = false;
 
         // =============================================================
-        // 5. 初始化地圖
+        // 9. 初始化地圖
         // =============================================================
 
         function initMap() {
@@ -1056,150 +1443,94 @@
             }).addTo(map);
 
             markersLayer = L.layerGroup().addTo(map);
-            renderMarkers();
+
+            loadRestaurants().then(data => {
+                restaurants = data;
+                renderMarkers();
+            });
 
             document.getElementById('locateBtn').addEventListener('click', doLocate);
             setupLocateEvents();
-            setupMobileSidebar();
         }
 
         // =============================================================
-        // 6. 手機側邊欄 (同前)
+        // 10. GPS 定位
         // =============================================================
 
-        function setupMobileSidebar() {
-            const hamburger = document.getElementById('hamburgerBtn');
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
+        const locateStatus = document.getElementById('locateStatus');
+        const locateBtn = document.getElementById('locateBtn');
 
-            function toggleSidebar(open) {
-                sidebar.classList.toggle('open', open);
-                backdrop.classList.toggle('active', open);
-            }
-
-            hamburger.addEventListener('click', () => {
-                const isOpen = sidebar.classList.contains('open');
-                toggleSidebar(!isOpen);
-            });
-
-            backdrop.addEventListener('click', () => toggleSidebar(false));
-
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768) {
-                    const isSidebar = sidebar.contains(e.target) || hamburger.contains(e.target);
-                    if (!isSidebar) toggleSidebar(false);
-                }
-            });
+        function showStatus(msg, type) {
+            locateStatus.textContent = msg;
+            locateStatus.className = 'locate-status show';
+            if (type) locateStatus.classList.add(type);
+            clearTimeout(locateStatus._timer);
+            locateStatus._timer = setTimeout(() => {
+                locateStatus.classList.remove('show');
+            }, 4000);
         }
-
-        // =============================================================
-        // 7. GPS 定位
-        // =============================================================
 
         function doLocate() {
             if (!map) return;
-            map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true, timeout: 10000 });
+            if (!navigator.geolocation) {
+                showStatus('⚠️ 此瀏覽器不支援定位', 'error');
+                return;
+            }
+            locateBtn.classList.add('loading');
+            showStatus('📍 正在獲取您的位置...', '');
+            map.locate({
+                setView: true,
+                maxZoom: 16,
+                enableHighAccuracy: true,
+                timeout: 15000,
+                watch: false
+            });
         }
 
         function setupLocateEvents() {
             map.on('locationfound', function(e) {
+                locateBtn.classList.remove('loading');
                 const latlng = e.latlng;
                 if (userMarker) map.removeLayer(userMarker);
                 const icon = L.divIcon({
-                    html: '<div style="background:#007DFF;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(0,125,255,0.4);"></div>',
+                    html: `<div style="background:#007DFF;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(0,125,255,0.3);"></div>`,
                     className: '',
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 8]
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
                 });
                 userMarker = L.marker(latlng, { icon: icon }).addTo(map)
-                    .bindPopup('📍 您的位置').openPopup();
+                    .bindPopup('📍 您的位置');
+                setTimeout(() => { if (userMarker) userMarker.openPopup(); }, 300);
+                showStatus('✅ 定位成功！', 'success');
+                map.setView(latlng, 15);
             });
+
             map.on('locationerror', function(e) {
-                alert('無法獲取您的位置，請確認已允許定位權限。');
+                locateBtn.classList.remove('loading');
+                let msg = '⚠️ 無法獲取位置';
+                if (e.message.includes('denied')) msg = '⚠️ 請允許定位權限';
+                else if (e.message.includes('timeout')) msg = '⏱️ 定位超時，請重試';
+                showStatus(msg, 'error');
+                map.setView([22.3193, 114.1694], 12);
             });
         }
 
         // =============================================================
-        // 8. 自訂標記圖標 (取消圓點，改用餐盤圖示)
+        // 11. 自訂標記圖標
         // =============================================================
 
         function createRestaurantIcon(color) {
             return L.divIcon({
-                html: `<div style="background-color:${color};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">🍽️</div>`,
+                html: `<div style="background-color:${color};width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.2);">🍽️</div>`,
                 className: '',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15],
-                popupAnchor: [0, -15]
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+                popupAnchor: [0, -16]
             });
         }
 
         // =============================================================
-        // 9. 渲染標記 (使用自訂圖標)
-        // =============================================================
-
-        function renderMarkers() {
-            markersLayer.clearLayers();
-            const filtered = getFilteredRestaurants();
-
-            if (filtered.length === 0) {
-                document.getElementById('restaurantList').innerHTML =
-                    '<div class="text-muted" style="text-align:center;padding:40px 0;">沒有符合條件的餐廳</div>';
-                return;
-            }
-
-            filtered.forEach(r => {
-                if (!r.lat || !r.lng) return;
-                const color = PRICE_COLORS[r.price] || '#007DFF';
-                const icon = createRestaurantIcon(color);
-                const marker = L.marker([r.lat, r.lng], { icon: icon });
-                const popupContent = buildInfoWindowContent(r);
-                marker.bindPopup(popupContent, { maxWidth: 280 });
-                markersLayer.addLayer(marker);
-            });
-
-            renderList(filtered);
-
-            if (filtered.length === 1) {
-                map.setView([filtered[0].lat, filtered[0].lng], 15);
-            } else if (filtered.length > 0) {
-                const group = L.featureGroup();
-                filtered.forEach(r => {
-                    if (r.lat && r.lng) group.addLayer(L.marker([r.lat, r.lng]));
-                });
-                if (group.getLayers().length > 0) {
-                    map.fitBounds(group.getBounds(), { padding: [50, 50] });
-                }
-            }
-        }
-
-        // =============================================================
-        // 10. 過濾邏輯 (含地區 'other' 與品類)
-        // =============================================================
-
-        function getFilteredRestaurants() {
-            return restaurants.filter(r => {
-                // 地區
-                if (activeDistrict === 'other') {
-                    // 其他：不屬於 18 區
-                    if (DISTRICTS.includes(r.district)) return false;
-                } else if (activeDistrict) {
-                    // 特定區
-                    if (r.district !== activeDistrict) return false;
-                }
-                // 價格
-                if (activePrice !== 'all' && r.price !== activePrice) return false;
-                // 星級 (精確匹配)
-                if (activeStars !== 'all' && r.rating !== parseInt(activeStars)) return false;
-                // 品類
-                if (activeCuisine !== 'all') {
-                    if (!r.cuisine || r.cuisine !== activeCuisine) return false;
-                }
-                return true;
-            });
-        }
-
-        // =============================================================
-        // 11. 彈窗內容 (安全轉義)
+        // 12. 構建彈窗內容
         // =============================================================
 
         function buildInfoWindowContent(r) {
@@ -1208,7 +1539,7 @@
             const priceClass = r.price;
 
             let html = `
-                <div class="info-window">
+                <div class="info-window" data-restaurant-id="${r.id}">
                     <div class="iw-name">${escapeHtml(r.name)}</div>
                     <div class="iw-meta">
                         <span class="iw-stars">${stars}</span>
@@ -1229,25 +1560,258 @@
             if (r.recommender) {
                 html += `<div class="iw-recommender">👤 推薦者：${escapeHtml(r.recommender)}</div>`;
             }
-            if (r.comment) {
-                html += `<div class="iw-comment">💬 ${escapeHtml(r.comment)}</div>`;
-            }
             if (r.image) {
                 html += `<div style="margin-top:6px;"><img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.name)}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'" /></div>`;
             }
-            html += `</div>`;
+
+            html += `<div class="iw-comments">`;
+            html += `<div style="font-weight:600;font-size:14px;margin-bottom:6px;">💬 評論 (${r.comments ? r.comments.length : 0})</div>`;
+
+            if (r.comments && r.comments.length > 0) {
+                const sorted = [...r.comments].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                sorted.forEach(c => {
+                    const rec = c.recommender ? `<span class="rec">👤 ${escapeHtml(c.recommender)}</span>` : '';
+                    html += `
+                        <div class="comment-item">
+                            <div class="comment-text">${escapeHtml(c.text)}</div>
+                            <div class="comment-meta">${escapeHtml(c.timestamp)} ${rec}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<div style="color:#8A9AA8;font-size:13px;">尚未有任何評論，快來發表第一篇吧！</div>`;
+            }
+
+            html += `
+                <div class="iw-comment-form">
+                    <div style="font-weight:500;font-size:13px;margin:6px 0 4px;">📝 新增評論</div>
+                    <input type="password" class="comment-pwd" placeholder="管理密碼" />
+                    <textarea class="comment-textarea" placeholder="寫下你的評論..." rows="2"></textarea>
+                    <div class="form-row">
+                        <input type="text" class="comment-recommender" placeholder="推薦者 (選填)" />
+                        <button class="btn-submit" type="button">提交評論</button>
+                    </div>
+                    <div class="comment-error"></div>
+                    <div class="comment-success"></div>
+                </div>
+            `;
+
+            html += `</div></div>`;
             return html;
         }
 
         // =============================================================
-        // 12. 側邊欄列表 (安全轉義)
+        // 13. 綁定評論提交事件
+        // =============================================================
+
+        function bindCommentForm(popupContainer, restaurantId) {
+            const form = popupContainer.querySelector('.iw-comment-form');
+            if (!form) return;
+
+            const pwdInput = form.querySelector('.comment-pwd');
+            const textarea = form.querySelector('.comment-textarea');
+            const recommenderInput = form.querySelector('.comment-recommender');
+            const submitBtn = form.querySelector('.btn-submit');
+            const errorDiv = form.querySelector('.comment-error');
+            const successDiv = form.querySelector('.comment-success');
+
+            const newBtn = submitBtn.cloneNode(true);
+            submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+            const newSubmit = newBtn;
+
+            newSubmit.addEventListener('click', async function() {
+                const password = pwdInput.value.trim();
+                const text = textarea.value.trim();
+                const recommender = recommenderInput.value.trim();
+
+                if (password !== STATIC_PASSWORD) {
+                    errorDiv.textContent = '❌ 密碼錯誤，請重新輸入';
+                    errorDiv.style.display = 'block';
+                    successDiv.style.display = 'none';
+                    pwdInput.value = '';
+                    pwdInput.focus();
+                    return;
+                }
+
+                if (!text) {
+                    errorDiv.textContent = '請填寫評論內容';
+                    errorDiv.style.display = 'block';
+                    successDiv.style.display = 'none';
+                    textarea.focus();
+                    return;
+                }
+
+                errorDiv.style.display = 'none';
+
+                const restaurant = restaurants.find(r => r.id === restaurantId);
+                if (!restaurant) {
+                    errorDiv.textContent = '❌ 找不到該餐廳';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                const now = new Date();
+                const timestamp =
+                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+                restaurant.comments.push({
+                    text: text,
+                    timestamp: timestamp,
+                    recommender: recommender
+                });
+
+                const index = restaurants.findIndex(r => r.id === restaurantId);
+                if (index !== -1) restaurants[index] = restaurant;
+
+                try {
+                    await signInAnonymously(auth);
+                    const result = await saveRestaurants(restaurants);
+                    await signOut(auth);
+
+                    if (result) {
+                        renderMarkers();
+                        setTimeout(() => openPopupForRestaurant(restaurantId, false), 100);
+                        pwdInput.value = '';
+                        textarea.value = '';
+                        recommenderInput.value = '';
+                        successDiv.textContent = '✅ 評論已新增！';
+                        successDiv.style.display = 'block';
+                        setTimeout(() => { successDiv.style.display = 'none'; }, 3000);
+                    }
+                } catch (error) {
+                    errorDiv.textContent = '❌ 儲存失敗，請檢查網路';
+                    errorDiv.style.display = 'block';
+                }
+            });
+        }
+
+        // =============================================================
+        // 14. 打開指定餐廳的彈窗
+        // =============================================================
+
+        function openPopupForRestaurant(restaurantId, focusComment = false) {
+            const restaurant = restaurants.find(r => r.id === restaurantId);
+            if (!restaurant || !restaurant.lat || !restaurant.lng) return;
+
+            let targetMarker = null;
+            markersLayer.eachLayer(layer => {
+                if (layer.getLatLng) {
+                    const latlng = layer.getLatLng();
+                    if (Math.abs(latlng.lat - restaurant.lat) < 0.0001 &&
+                        Math.abs(latlng.lng - restaurant.lng) < 0.0001) {
+                        targetMarker = layer;
+                    }
+                }
+            });
+
+            if (targetMarker) {
+                map.setView([restaurant.lat, restaurant.lng], 14);
+                focusCommentOnOpen = focusComment;
+                targetMarker.openPopup();
+            }
+        }
+
+        // =============================================================
+        // 15. 渲染標記
+        // =============================================================
+
+        function renderMarkers() {
+            markersLayer.clearLayers();
+            const filtered = getFilteredRestaurants();
+
+            if (filtered.length === 0) {
+                document.getElementById('restaurantList').innerHTML =
+                    '<div class="text-muted" style="text-align:center;padding:20px 0;">沒有符合條件的餐廳</div>';
+                updateMobileCuisineFilter();
+                return;
+            }
+
+            const currentId = currentPopupRestaurantId;
+
+            filtered.forEach(r => {
+                if (!r.lat || !r.lng) return;
+                const color = PRICE_COLORS[r.price] || '#007DFF';
+                const icon = createRestaurantIcon(color);
+                const marker = L.marker([r.lat, r.lng], { icon: icon });
+                const popupContent = buildInfoWindowContent(r);
+                marker.bindPopup(popupContent, { maxWidth: 320, minWidth: 280 });
+
+                marker.on('popupopen', function() {
+                    const popup = this.getPopup();
+                    const container = popup.getElement();
+                    if (container) {
+                        bindCommentForm(container, r.id);
+                        currentPopupRestaurantId = r.id;
+
+                        if (focusCommentOnOpen) {
+                            const textarea = container.querySelector('.comment-textarea');
+                            if (textarea) {
+                                setTimeout(() => {
+                                    textarea.focus();
+                                    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 300);
+                            }
+                            focusCommentOnOpen = false;
+                        }
+                    }
+                });
+
+                marker.on('popupclose', function() {
+                    currentPopupRestaurantId = null;
+                });
+
+                markersLayer.addLayer(marker);
+            });
+
+            renderList(filtered);
+            updateMobileCuisineFilter();
+
+            if (filtered.length === 1) {
+                map.setView([filtered[0].lat, filtered[0].lng], 15);
+            } else if (filtered.length > 0) {
+                const group = L.featureGroup();
+                filtered.forEach(r => {
+                    if (r.lat && r.lng) group.addLayer(L.marker([r.lat, r.lng]));
+                });
+                if (group.getLayers().length > 0) {
+                    map.fitBounds(group.getBounds(), { padding: [50, 50] });
+                }
+            }
+
+            if (currentId) {
+                setTimeout(() => openPopupForRestaurant(currentId, false), 200);
+            }
+        }
+
+        // =============================================================
+        // 16. 過濾邏輯
+        // =============================================================
+
+        function getFilteredRestaurants() {
+            return restaurants.filter(r => {
+                if (activeDistrict === 'other') {
+                    if (DISTRICTS.includes(r.district)) return false;
+                } else if (activeDistrict) {
+                    if (r.district !== activeDistrict) return false;
+                }
+                if (activePrice !== 'all' && r.price !== activePrice) return false;
+                if (activeStars !== 'all' && r.rating !== parseInt(activeStars)) return false;
+                if (activeCuisine !== 'all') {
+                    if (!r.cuisine || r.cuisine !== activeCuisine) return false;
+                }
+                return true;
+            });
+        }
+
+        // =============================================================
+        // 17. 側邊欄列表
         // =============================================================
 
         function renderList(filtered) {
             const container = document.getElementById('restaurantList');
             if (!filtered || filtered.length === 0) {
                 container.innerHTML =
-                    '<div class="text-muted" style="text-align:center;padding:40px 0;">沒有符合條件的餐廳 🍽️</div>';
+                    '<div class="text-muted" style="text-align:center;padding:20px 0;">沒有符合條件的餐廳 🍽️</div>';
                 return;
             }
 
@@ -1267,57 +1831,46 @@
                             ${r.cuisine ? `<span class="cuisine-type">${escapeHtml(r.cuisine)}</span>` : ''}
                         </div>
                         ${r.comment ? `<div class="comment-preview">💬 ${escapeHtml(r.comment)}</div>` : ''}
-                        <div style="font-size:12px;color:#8A9AA8;margin-top:4px;">📍 ${escapeHtml(r.location || '地址待補')}</div>
+                        <div style="font-size:11px;color:#8A9AA8;margin-top:2px;">📍 ${escapeHtml(r.location || '地址待補')}</div>
                         ${r.recommender ? `<div class="recommender">👤 推薦者：${escapeHtml(r.recommender)}</div>` : ''}
+                        <div style="font-size:11px;color:#8A9AA8;margin-top:2px;">💬 ${r.comments ? r.comments.length : 0} 則評論</div>
+                        <div class="card-actions">
+                            <button class="btn-edit" data-id="${r.id}">✏️ 編輯評論</button>
+                        </div>
                     </div>
                 `;
             });
 
             container.innerHTML = html;
 
-            // 卡片點擊定位 (同前)
             container.querySelectorAll('.restaurant-card').forEach(el => {
-                el.addEventListener('click', () => {
-                    const id = el.dataset.id;
-                    const restaurant = restaurants.find(r => r.id === id);
-                    if (!restaurant || !restaurant.lat || !restaurant.lng) return;
-
-                    let targetMarker = null;
-                    markersLayer.eachLayer(layer => {
-                        if (layer.getLatLng) {
-                            const latlng = layer.getLatLng();
-                            if (Math.abs(latlng.lat - restaurant.lat) < 0.0001 &&
-                                Math.abs(latlng.lng - restaurant.lng) < 0.0001) {
-                                targetMarker = layer;
-                            }
-                        }
-                    });
-                    if (targetMarker) {
-                        map.setView([restaurant.lat, restaurant.lng], 14);
-                        targetMarker.openPopup();
-                    } else {
-                        map.setView([restaurant.lat, restaurant.lng], 14);
-                    }
-                    if (window.innerWidth <= 768) {
-                        document.getElementById('sidebar').classList.remove('open');
-                        document.getElementById('sidebarBackdrop').classList.remove('active');
-                    }
+                el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('btn-edit')) return;
+                    const id = this.dataset.id;
+                    openPopupForRestaurant(id, false);
                 });
+
+                const editBtn = el.querySelector('.btn-edit');
+                if (editBtn) {
+                    editBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = this.dataset.id;
+                        openPopupForRestaurant(id, true);
+                    });
+                }
             });
         }
 
         // =============================================================
-        // 13. 地區按鈕 (加入「其他」)
+        // 18. 地區按鈕
         // =============================================================
 
         function renderDistrictButtons() {
             const grid = document.getElementById('districtGrid');
             let html = '<div class="district-tag active" data-district="">全部</div>';
-            // 18區
             DISTRICTS.forEach(d => {
                 html += `<div class="district-tag" data-district="${d}">${d}</div>`;
             });
-            // 新增「其他」
             html += `<div class="district-tag" data-district="other">其他</div>`;
             grid.innerHTML = html;
 
@@ -1328,67 +1881,188 @@
                     this.classList.add('active');
                     const val = this.dataset.district;
                     activeDistrict = val === '' ? null : val;
+                    syncMobileDistrict(activeDistrict);
                     renderMarkers();
                 });
+            });
+
+            renderMobileDistrictButtons();
+        }
+
+        function renderMobileDistrictButtons() {
+            const container = document.getElementById('mobileDistrictFilter');
+            let html = '<span class="filter-tag active" data-district="">全部</span>';
+            DISTRICTS.forEach(d => {
+                html += `<span class="filter-tag" data-district="${d}">${d}</span>`;
+            });
+            html += `<span class="filter-tag" data-district="other">其他</span>`;
+            container.innerHTML = html;
+
+            container.querySelectorAll('.filter-tag').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    container.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const val = this.dataset.district;
+                    activeDistrict = val === '' ? null : val;
+                    syncDesktopDistrict(activeDistrict);
+                    renderMarkers();
+                });
+            });
+
+            syncMobileDistrict(activeDistrict);
+        }
+
+        function syncMobileDistrict(value) {
+            const container = document.getElementById('mobileDistrictFilter');
+            container.querySelectorAll('.filter-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset.district === (value || ''));
+            });
+        }
+
+        function syncDesktopDistrict(value) {
+            const grid = document.getElementById('districtGrid');
+            grid.querySelectorAll('.district-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset.district === (value || ''));
             });
         }
 
         // =============================================================
-        // 14. 價格 & 星級 & 品類篩選
+        // 19. 過濾器 (價格、星級、品類)
         // =============================================================
 
         function setupFilters() {
-            // 價格
             const priceContainer = document.getElementById('priceFilter');
             priceContainer.querySelectorAll('.filter-tag').forEach(el => {
                 el.addEventListener('click', () => {
                     priceContainer.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
                     el.classList.add('active');
                     activePrice = el.dataset.price;
+                    syncMobileFilter('price', activePrice);
                     renderMarkers();
                 });
             });
 
-            // 星級
             const starContainer = document.getElementById('starFilter');
             starContainer.querySelectorAll('.filter-tag').forEach(el => {
                 el.addEventListener('click', () => {
                     starContainer.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
                     el.classList.add('active');
                     activeStars = el.dataset.stars;
+                    syncMobileFilter('star', activeStars);
                     renderMarkers();
                 });
             });
 
-            // 品類 (動態生成)
+            const mobilePrice = document.getElementById('mobilePriceFilter');
+            mobilePrice.querySelectorAll('.filter-tag').forEach(el => {
+                el.addEventListener('click', () => {
+                    mobilePrice.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    el.classList.add('active');
+                    activePrice = el.dataset.price;
+                    syncDesktopFilter('price', activePrice);
+                    renderMarkers();
+                });
+            });
+
+            const mobileStar = document.getElementById('mobileStarFilter');
+            mobileStar.querySelectorAll('.filter-tag').forEach(el => {
+                el.addEventListener('click', () => {
+                    mobileStar.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    el.classList.add('active');
+                    activeStars = el.dataset.stars;
+                    syncDesktopFilter('star', activeStars);
+                    renderMarkers();
+                });
+            });
+
             updateCuisineFilter();
         }
 
+        function syncMobileFilter(type, value) {
+            const container = type === 'price' ? document.getElementById('mobilePriceFilter') : document.getElementById(
+                'mobileStarFilter');
+            container.querySelectorAll('.filter-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset[type] === value);
+            });
+        }
+
+        function syncDesktopFilter(type, value) {
+            const container = type === 'price' ? document.getElementById('priceFilter') : document.getElementById(
+            'starFilter');
+            container.querySelectorAll('.filter-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset[type] === value);
+            });
+        }
+
         function updateCuisineFilter() {
-            const container = document.getElementById('cuisineFilter');
-            // 取得所有非空 cuisine
             const cuisines = new Set();
             restaurants.forEach(r => {
                 if (r.cuisine && r.cuisine.trim()) cuisines.add(r.cuisine.trim());
             });
+
+            const desktopContainer = document.getElementById('cuisineFilter');
             let html = `<span class="filter-tag cuisine active" data-cuisine="all">全部</span>`;
             cuisines.forEach(c => {
                 html += `<span class="filter-tag cuisine" data-cuisine="${escapeHtml(c)}">${escapeHtml(c)}</span>`;
             });
-            container.innerHTML = html;
-
-            container.querySelectorAll('.filter-tag').forEach(el => {
+            desktopContainer.innerHTML = html;
+            desktopContainer.querySelectorAll('.filter-tag').forEach(el => {
                 el.addEventListener('click', () => {
-                    container.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    desktopContainer.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
                     el.classList.add('active');
                     activeCuisine = el.dataset.cuisine;
+                    syncMobileCuisine(activeCuisine);
                     renderMarkers();
                 });
+            });
+
+            updateMobileCuisineFilter();
+        }
+
+        function updateMobileCuisineFilter() {
+            const cuisines = new Set();
+            const filtered = getFilteredRestaurants();
+            filtered.forEach(r => {
+                if (r.cuisine && r.cuisine.trim()) cuisines.add(r.cuisine.trim());
+            });
+
+            const mobileContainer = document.getElementById('mobileCuisineFilter');
+            let html = `<span class="filter-tag cuisine active" data-cuisine="all">全部</span>`;
+            cuisines.forEach(c => {
+                html += `<span class="filter-tag cuisine" data-cuisine="${escapeHtml(c)}">${escapeHtml(c)}</span>`;
+            });
+            mobileContainer.innerHTML = html;
+            mobileContainer.querySelectorAll('.filter-tag').forEach(el => {
+                el.addEventListener('click', () => {
+                    mobileContainer.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    el.classList.add('active');
+                    activeCuisine = el.dataset.cuisine;
+                    syncDesktopCuisine(activeCuisine);
+                    renderMarkers();
+                });
+            });
+            mobileContainer.querySelectorAll('.filter-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset.cuisine === activeCuisine);
+            });
+        }
+
+        function syncMobileCuisine(value) {
+            const container = document.getElementById('mobileCuisineFilter');
+            container.querySelectorAll('.filter-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset.cuisine === value);
+            });
+        }
+
+        function syncDesktopCuisine(value) {
+            const container = document.getElementById('cuisineFilter');
+            container.querySelectorAll('.filter-tag').forEach(el => {
+                el.classList.toggle('active', el.dataset.cuisine === value);
             });
         }
 
         // =============================================================
-        // 15. 新增餐廳 (完整驗證，支援「其他」地區)
+        // 20. 新增餐廳
         // =============================================================
 
         function setupAddForm() {
@@ -1399,10 +2073,12 @@
             const districtSelect = document.getElementById('fDistrict');
             const customDistrictGroup = document.getElementById('customDistrictGroup');
             const customDistrictInput = document.getElementById('fCustomDistrict');
+            const cuisineSelect = document.getElementById('fCuisine');
+            const customCuisineGroup = document.getElementById('customCuisineGroup');
+            const customCuisineInput = document.getElementById('fCustomCuisine');
             const pwdInput = document.getElementById('fPassword');
             const pwdError = document.getElementById('pwdError');
 
-            // 填入地區選項 (18區 + 其他)
             const optOther = document.createElement('option');
             optOther.value = 'other';
             optOther.textContent = '其他 (自訂)';
@@ -1414,13 +2090,21 @@
                 districtSelect.appendChild(opt);
             });
 
-            // 當選擇「其他」時顯示自訂輸入框
             districtSelect.addEventListener('change', function() {
                 if (this.value === 'other') {
                     customDistrictGroup.style.display = 'block';
                     customDistrictInput.focus();
                 } else {
                     customDistrictGroup.style.display = 'none';
+                }
+            });
+
+            cuisineSelect.addEventListener('change', function() {
+                if (this.value === '其他') {
+                    customCuisineGroup.style.display = 'block';
+                    customCuisineInput.focus();
+                } else {
+                    customCuisineGroup.style.display = 'none';
                 }
             });
 
@@ -1432,6 +2116,7 @@
                     districtSelect.value = '';
                 }
                 customDistrictGroup.style.display = 'none';
+                customCuisineGroup.style.display = 'none';
                 document.getElementById('fName').focus();
                 pwdInput.value = '';
                 pwdError.classList.remove('show');
@@ -1443,6 +2128,7 @@
                 pwdError.classList.remove('show');
                 pwdInput.value = '';
                 customDistrictGroup.style.display = 'none';
+                customCuisineGroup.style.display = 'none';
             });
 
             modal.addEventListener('click', (e) => {
@@ -1452,29 +2138,26 @@
                     pwdError.classList.remove('show');
                     pwdInput.value = '';
                     customDistrictGroup.style.display = 'none';
+                    customCuisineGroup.style.display = 'none';
                 }
             });
 
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
-                // 密碼
                 const password = pwdInput.value.trim();
                 if (password !== STATIC_PASSWORD) {
                     pwdError.classList.add('show');
                     pwdInput.value = '';
                     pwdInput.focus();
                     return;
-                } else {
-                    pwdError.classList.remove('show');
                 }
+                pwdError.classList.remove('show');
 
-                // 獲取欄位
                 const name = document.getElementById('fName').value.trim();
                 let district = document.getElementById('fDistrict').value;
                 const price = document.getElementById('fPrice').value;
                 const rating = parseInt(document.getElementById('fRating').value);
-                const cuisine = document.getElementById('fCuisine').value.trim();
                 const location = document.getElementById('fLocation').value.trim();
                 const phone = document.getElementById('fPhone').value.trim();
                 const hours = document.getElementById('fHours').value.trim();
@@ -1482,7 +2165,17 @@
                 const image = document.getElementById('fImage').value.trim();
                 const comment = document.getElementById('fComment').value.trim();
 
-                // 處理「其他」地區
+                let cuisine = cuisineSelect.value;
+                if (cuisine === '其他') {
+                    const custom = customCuisineInput.value.trim();
+                    if (!custom) {
+                        alert('請輸入自訂品類名稱。');
+                        customCuisineInput.focus();
+                        return;
+                    }
+                    cuisine = custom;
+                }
+
                 if (district === 'other') {
                     const custom = customDistrictInput.value.trim();
                     if (!custom) {
@@ -1496,13 +2189,11 @@
                     return;
                 }
 
-                // 型別與內容檢查
                 if (!isValidName(name)) {
                     alert('餐廳名稱必須為 1~50 個字元。');
                     document.getElementById('fName').focus();
                     return;
                 }
-                // 地區不必再檢查是否在DISTRICTS，因為可能是自訂
                 if (!['high', 'medium', 'low'].includes(price)) {
                     alert('價格等級錯誤。');
                     return;
@@ -1517,18 +2208,13 @@
                     return;
                 }
                 if (!isValidPhone(phone)) {
-                    alert('電話號碼格式不正確，請輸入有效的電話號碼。');
+                    alert('電話號碼格式不正確。');
                     document.getElementById('fPhone').focus();
                     return;
                 }
                 if (!isValidUrl(image)) {
-                    alert('圖片網址格式不正確，請輸入有效的 http/https 網址。');
+                    alert('圖片網址格式不正確。');
                     document.getElementById('fImage').focus();
-                    return;
-                }
-                if (cuisine.length > 30) {
-                    alert('品類名稱請勿超過 30 個字元。');
-                    document.getElementById('fCuisine').focus();
                     return;
                 }
                 if (hours.length > 30) {
@@ -1547,39 +2233,32 @@
                     return;
                 }
 
-                // 經緯度生成 (若地區為自訂，使用香港中心加隨機偏移)
-                let base;
-                if (DISTRICTS.includes(district)) {
-                    const baseCoords = {
-                        '中西區': { lat: 22.285, lng: 114.155 },
-                        '灣仔區': { lat: 22.278, lng: 114.178 },
-                        '東區': { lat: 22.282, lng: 114.225 },
-                        '南區': { lat: 22.248, lng: 114.153 },
-                        '油尖旺區': { lat: 22.305, lng: 114.171 },
-                        '深水埗區': { lat: 22.331, lng: 114.163 },
-                        '九龍城區': { lat: 22.327, lng: 114.187 },
-                        '黃大仙區': { lat: 22.342, lng: 114.196 },
-                        '觀塘區': { lat: 22.315, lng: 114.226 },
-                        '荃灣區': { lat: 22.370, lng: 114.114 },
-                        '屯門區': { lat: 22.391, lng: 113.978 },
-                        '元朗區': { lat: 22.443, lng: 114.022 },
-                        '北區': { lat: 22.495, lng: 114.138 },
-                        '大埔區': { lat: 22.453, lng: 114.163 },
-                        '沙田區': { lat: 22.383, lng: 114.192 },
-                        '西貢區': { lat: 22.381, lng: 114.275 },
-                        '離島區': { lat: 22.261, lng: 113.946 },
-                        '葵青區': { lat: 22.364, lng: 114.132 }
-                    };
-                    base = baseCoords[district];
-                } else {
-                    // 自訂地區使用香港中心
-                    base = { lat: 22.3193, lng: 114.1694 };
-                }
+                const baseCoords = {
+                    '中西區': { lat: 22.285, lng: 114.155 },
+                    '灣仔區': { lat: 22.278, lng: 114.178 },
+                    '東區': { lat: 22.282, lng: 114.225 },
+                    '南區': { lat: 22.248, lng: 114.153 },
+                    '油尖旺區': { lat: 22.305, lng: 114.171 },
+                    '深水埗區': { lat: 22.331, lng: 114.163 },
+                    '九龍城區': { lat: 22.327, lng: 114.187 },
+                    '黃大仙區': { lat: 22.342, lng: 114.196 },
+                    '觀塘區': { lat: 22.315, lng: 114.226 },
+                    '荃灣區': { lat: 22.370, lng: 114.114 },
+                    '屯門區': { lat: 22.391, lng: 113.978 },
+                    '元朗區': { lat: 22.443, lng: 114.022 },
+                    '北區': { lat: 22.495, lng: 114.138 },
+                    '大埔區': { lat: 22.453, lng: 114.163 },
+                    '沙田區': { lat: 22.383, lng: 114.192 },
+                    '西貢區': { lat: 22.381, lng: 114.275 },
+                    '離島區': { lat: 22.261, lng: 113.946 },
+                    '葵青區': { lat: 22.364, lng: 114.132 }
+                };
+                const base = baseCoords[district] || { lat: 22.3193, lng: 114.1694 };
                 const lat = base.lat + (Math.random() - 0.5) * 0.008;
                 const lng = base.lng + (Math.random() - 0.5) * 0.008;
 
                 const newRestaurant = {
-                    id: 'r' + (nextId++),
+                    id: 'r' + Date.now(),
                     name,
                     district,
                     price,
@@ -1592,44 +2271,55 @@
                     image,
                     comment,
                     lat,
-                    lng
+                    lng,
+                    comments: []
                 };
 
                 restaurants.push(newRestaurant);
-                saveRestaurants(restaurants);
-                renderMarkers();
-                // 更新品類篩選器 (因可能新增新菜系)
-                updateCuisineFilter();
 
-                modal.classList.remove('open');
-                form.reset();
-                pwdError.classList.remove('show');
-                pwdInput.value = '';
-                customDistrictGroup.style.display = 'none';
+                try {
+                    await signInAnonymously(auth);
+                    const result = await saveRestaurants(restaurants);
+                    await signOut(auth);
 
-                // 自動切換到該地區 (若為自訂則切換到「其他」)
-                if (DISTRICTS.includes(district)) {
-                    activeDistrict = district;
-                    document.querySelectorAll('.district-tag').forEach(el => {
-                        el.classList.toggle('active', el.dataset.district === district);
-                    });
-                } else {
-                    activeDistrict = 'other';
-                    document.querySelectorAll('.district-tag').forEach(el => {
-                        el.classList.toggle('active', el.dataset.district === 'other');
-                    });
+                    if (result) {
+                        modal.classList.remove('open');
+                        form.reset();
+                        pwdError.classList.remove('show');
+                        pwdInput.value = '';
+                        customDistrictGroup.style.display = 'none';
+                        customCuisineGroup.style.display = 'none';
+
+                        if (DISTRICTS.includes(district)) {
+                            activeDistrict = district;
+                            document.querySelectorAll('.district-tag').forEach(el => {
+                                el.classList.toggle('active', el.dataset.district === district);
+                            });
+                            syncMobileDistrict(district);
+                        } else {
+                            activeDistrict = 'other';
+                            document.querySelectorAll('.district-tag').forEach(el => {
+                                el.classList.toggle('active', el.dataset.district === 'other');
+                            });
+                            syncMobileDistrict('other');
+                        }
+                        renderMarkers();
+
+                        const btn = form.querySelector('button[type="submit"]');
+                        const orig = btn.textContent;
+                        btn.textContent = '✅ 已新增！';
+                        setTimeout(() => { btn.textContent = orig; }, 1500);
+                    }
+                } catch (error) {
+                    console.error('儲存失敗:', error);
+                    alert('⚠️ 儲存失敗，請檢查網路連線');
+                    restaurants.pop();
                 }
-                renderMarkers();
-
-                const btn = form.querySelector('button[type="submit"]');
-                const orig = btn.textContent;
-                btn.textContent = '✅ 已新增！';
-                setTimeout(() => { btn.textContent = orig; }, 1500);
             });
         }
 
         // =============================================================
-        // 16. 啟動
+        // 21. 啟動
         // =============================================================
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1638,10 +2328,9 @@
             setupFilters();
             setupAddForm();
 
-            console.log('🍜 食在地圖已啟動 (Leaflet + OSM)');
-            console.log('📌 新增餐廳密碼:', STATIC_PASSWORD);
-            console.log('💾 資料儲存於 localStorage');
-            console.log('🏙️ 共 ' + restaurants.length + ' 間餐廳 (3星制)');
+            console.log('🍜 HW 飲食地圖已啟動 (Firebase 模組化 SDK v12)');
+            console.log('📌 管理密碼:', STATIC_PASSWORD);
+            console.log('🔥 Firebase 已連線 (使用 persistentLocalCache)');
         });
     </script>
 
