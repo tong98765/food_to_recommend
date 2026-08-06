@@ -696,168 +696,169 @@
            手機版 (全屏 Modal + 動態高度)
            ============================================================ */
         @media (max-width: 768px) {
-            .sidebar {
-                display: none !important;
-            }
-
-            .app-body {
-                display: flex;
-                flex-direction: column;
-                height: calc(100dvh - 56px);
-                overflow: hidden;
-                padding: 0;
-            }
-
-            .map-container {
-                flex: 1;
-                min-height: 0;
-                width: 100%;
-                position: relative;
-            }
-            #map {
-                height: 100%;
-                width: 100%;
-            }
-
-            /* 手機底部 Filter Bar */
-            .mobile-filter-bar {
-                display: block !important;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 50dvh;
-                max-height: none;
-                overflow-y: auto;
-                background: #FFFFFF;
-                border-top: 1px solid rgba(0, 0, 0, 0.06);
-                padding: 8px 12px 12px;
-                z-index: 50;
-                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-            }
-            .mobile-filter-bar .filter-label {
-                font-size: 12px;
-                font-weight: 600;
-                color: #8A9AA8;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                padding: 4px 0 4px 2px;
-            }
-            .mobile-filter-bar .filter-row {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 5px;
-                margin-bottom: 6px;
-            }
-            .mobile-filter-bar .filter-row.price-row,
-            .mobile-filter-bar .filter-row.star-row {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            .mobile-filter-bar .cuisine-select-wrapper {
-                margin-top: 0;
-                padding-bottom: 4px;
-            }
-            .mobile-filter-bar .cuisine-select-wrapper select {
-                padding: 6px 10px;
-                font-size: 13px;
-                border-radius: 16px;
-                background: #F5F6F8;
-                border: 1.5px solid #D0D7DE;
-            }
-
-            .locate-btn {
-                bottom: calc(50dvh + 20px);
-                right: 16px;
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-            }
-            .locate-status {
-                bottom: calc(50dvh + 80px);
-                right: 16px;
-                font-size: 13px;
-                padding: 6px 16px;
-            }
-
-            /* ---- 手機全屏 Modal (修正關閉與遮罩) ---- */
-            .modal-overlay {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background: #FFFFFF !important;
-                backdrop-filter: none !important;
-                align-items: stretch !important;
-                justify-content: stretch !important;
-                padding: 0 !important;
-                display: none !important;
-                z-index: 2000 !important; /* 高於 Filter 欄 */
-            }
-            .modal-overlay.open {
-                display: flex !important;
-            }
-            .modal {
-                max-width: 100% !important;
-                width: 100% !important;
-                height: 100% !important;
-                max-height: 100% !important;
-                border-radius: 0 !important;
-                padding: 20px 18px 30px !important;
-                box-shadow: none !important;
-                animation: none !important;
-                overflow-y: auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                background: #FFFFFF !important;
-                margin: 0 !important;
-                position: relative;
-            }
-            /* 加入關閉按鈕在頂部 (手機) */
-            .modal .modal-close-top {
-                display: flex !important;
-                justify-content: flex-end;
-                margin-bottom: 12px;
-                flex-shrink: 0;
-            }
-            .modal .modal-close-top button {
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #8A9AA8;
-                padding: 8px;
-                cursor: pointer;
-                line-height: 1;
-            }
-            .modal .modal-close-top button:hover {
-                color: #1A1A1A;
-            }
-            .modal h2 {
-                font-size: 18px;
-                margin-bottom: 12px;
-                flex-shrink: 0;
-            }
-            .modal .form-group {
-                margin-bottom: 10px;
-            }
-            .modal .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            .modal .modal-actions {
-                margin-top: 16px;
-                padding-top: 12px;
-                flex-shrink: 0;
-            }
-            .modal .btn#closeAddBtn {
-                background: #F0F2F5;
-                color: #1A1A1A;
-            }
-            .modal .btn-success {
-                width: auto;
-                padding: 8px 20px;
-            }
+        .sidebar {
+            display: none !important;
         }
+
+        .app-body {
+            display: flex;
+            flex-direction: column;
+            height: calc(100dvh - 56px);
+            overflow: hidden;
+            padding-bottom: 50dvh !important;  /* 關鍵：預留 filter 空間 */
+        }
+
+        .map-container {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            position: relative;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* 手機底部 Filter Bar - 強制顯示與定位 */
+        .mobile-filter-bar {
+            display: block !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 50dvh !important;
+            max-height: none !important;
+            overflow-y: auto !important;
+            background: #FFFFFF !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+            padding: 8px 12px 12px !important;
+            z-index: 100 !important;  /* 提高層級，確保不被地圖蓋住 */
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .mobile-filter-bar .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8A9AA8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 0 4px 2px;
+        }
+        .mobile-filter-bar .filter-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+        .mobile-filter-bar .filter-row.price-row,
+        .mobile-filter-bar .filter-row.star-row {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .mobile-filter-bar .cuisine-select-wrapper {
+            margin-top: 0;
+            padding-bottom: 4px;
+        }
+        .mobile-filter-bar .cuisine-select-wrapper select {
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 16px;
+            background: #F5F6F8;
+            border: 1.5px solid #D0D7DE;
+            width: 100%;
+        }
+
+        .locate-btn {
+            bottom: calc(50dvh + 20px);
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+        }
+        .locate-status {
+            bottom: calc(50dvh + 80px);
+            right: 16px;
+            font-size: 13px;
+            padding: 6px 16px;
+        }
+
+        /* 手機全屏 Modal 樣式（保持不變） */
+        .modal-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: #FFFFFF !important;
+            backdrop-filter: none !important;
+            align-items: stretch !important;
+            justify-content: stretch !important;
+            padding: 0 !important;
+            display: none !important;
+            z-index: 2000 !important;
+        }
+        .modal-overlay.open {
+            display: flex !important;
+        }
+        .modal {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            border-radius: 0 !important;
+            padding: 20px 18px 30px !important;
+            box-shadow: none !important;
+            animation: none !important;
+            overflow-y: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background: #FFFFFF !important;
+            margin: 0 !important;
+            position: relative;
+        }
+        .modal .modal-close-top {
+            display: flex !important;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        .modal .modal-close-top button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #8A9AA8;
+            padding: 8px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal .modal-close-top button:hover {
+            color: #1A1A1A;
+        }
+        .modal h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        .modal .form-group {
+            margin-bottom: 10px;
+        }
+        .modal .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+        .modal .modal-actions {
+            margin-top: 16px;
+            padding-top: 12px;
+            flex-shrink: 0;
+        }
+        .modal .btn#closeAddBtn {
+            background: #F0F2F5;
+            color: #1A1A1A;
+        }
+        .modal .btn-success {
+            width: auto;
+            padding: 8px 20px;
+        }
+    }
 
         @media (min-width: 769px) {
             .mobile-filter-bar {
