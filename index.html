@@ -12,7 +12,7 @@
 
     <style>
         /* ============================================================
-           全域樣式 (精簡版，保留主要功能)
+           全域樣式 (不變)
            ============================================================ */
         * {
             margin: 0;
@@ -110,9 +110,10 @@
             display: flex;
             height: calc(100vh - 56px);
             position: relative;
+            transition: all 0.3s ease;
         }
 
-        /* ---------- 側邊欄 ---------- */
+        /* ---------- 側邊欄 (桌面) ---------- */
         .sidebar {
             width: 340px;
             min-width: 340px;
@@ -124,17 +125,23 @@
             z-index: 20;
             box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
         }
+
         .sidebar-scroll {
             flex: 1;
             overflow-y: auto;
             padding: 0 0 12px 0;
         }
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #D0D7DE;
+            border-radius: 4px;
+        }
+
         .sidebar-section {
             padding: 14px 18px 10px;
             border-bottom: 1px solid #F1F3F5;
-        }
-        .sidebar-section:last-of-type {
-            border-bottom: none;
         }
         .sidebar-section h3 {
             font-size: 12px;
@@ -237,8 +244,17 @@
             border-color: #FFB800;
             color: #FFB800;
         }
+        /* 適合談生意篩選按鈕 (桌面) */
+        .filter-tag.business {
+            color: #6C5CE7;
+        }
+        .filter-tag.business.active {
+            background: #EDE7F6;
+            border-color: #6C5CE7;
+            color: #6C5CE7;
+        }
 
-        /* 品類下拉選單 (桌面與手機通用) */
+        /* 品類下拉選單 (桌面) */
         .cuisine-select-wrapper {
             margin-top: 4px;
         }
@@ -352,6 +368,25 @@
             color: #8A9AA8;
             margin-top: 2px;
         }
+        /* 適合談生意標記 */
+        .restaurant-card .business-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #4A5A6A;
+        }
+        .restaurant-card .business-tags span {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .restaurant-card .business-tags .yes {
+            color: #2ED573;
+        }
+        .restaurant-card .business-tags .no {
+            color: #D0D7DE;
+        }
         .restaurant-card .card-actions {
             margin-top: 6px;
             display: flex;
@@ -366,10 +401,42 @@
             flex: 1;
             position: relative;
             background: #E8ECF0;
+            transition: all 0.4s ease;
+            overflow: hidden;
         }
         #map {
             width: 100%;
             height: 100%;
+            transition: height 0.4s ease;
+        }
+
+        /* ---------- 折疊按鈕 (固定於 app-body 右上角) ---------- */
+        .toggle-map-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 600;
+            background: #FFFFFF;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            font-size: 20px;
+            color: #4A5A6A;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .toggle-map-btn:hover {
+            background: #F0F7FF;
+            transform: scale(1.05);
+        }
+        .toggle-map-btn:active {
+            transform: scale(0.95);
         }
 
         /* ---------- 定位按鈕 ---------- */
@@ -480,6 +547,25 @@
             font-size: 12px;
             color: #8A9AA8;
             margin-top: 2px;
+        }
+        /* 適合談生意標記 - 彈窗 */
+        .leaflet-popup-content .iw-business {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #4A5A6A;
+        }
+        .leaflet-popup-content .iw-business span {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .leaflet-popup-content .iw-business .yes {
+            color: #2ED573;
+        }
+        .leaflet-popup-content .iw-business .no {
+            color: #D0D7DE;
         }
         .leaflet-popup-content .price-badge {
             display: inline-block;
@@ -670,6 +756,28 @@
         .modal .form-row .form-group {
             flex: 1;
         }
+        /* 適合談生意 Checkbox 群組 */
+        .modal .business-checkbox-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 4px;
+        }
+        .modal .business-checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #1A1A1A;
+            cursor: pointer;
+        }
+        .modal .business-checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #007DFF;
+            cursor: pointer;
+        }
         .modal .modal-actions {
             display: flex;
             gap: 10px;
@@ -693,173 +801,221 @@
         }
 
         /* ============================================================
-           手機版 (全屏 Modal + 動態高度)
+           手機版 (Filter 使用 Flex 佈局)
            ============================================================ */
         @media (max-width: 768px) {
-        .sidebar {
-            display: none !important;
+            .sidebar {
+                display: none !important;
+            }
+
+            .app-body {
+                display: flex !important;
+                flex-direction: column !important;
+                height: calc(100dvh - 56px) !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .map-container {
+                flex: 1 !important;
+                min-height: 0 !important;
+                width: 100% !important;
+                position: relative !important;
+                transition: flex 0.4s ease, max-height 0.4s ease;
+            }
+            /* 折疊狀態 (手機) */
+            .app-body.map-collapsed .map-container {
+                flex: 0 0 0 !important;
+                max-height: 0 !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .app-body.map-collapsed .mobile-filter-bar {
+                flex: 1 !important;
+                height: auto !important;
+                max-height: 100% !important;
+            }
+
+            #map {
+                height: 100% !important;
+                width: 100% !important;
+            }
+
+            .mobile-filter-bar {
+                display: flex !important;
+                flex-direction: column !important;
+                flex-shrink: 0 !important;
+                height: 50dvh !important;
+                max-height: none !important;
+                overflow-y: auto !important;
+                background: #FFFFFF !important;
+                border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+                padding: 8px 12px 12px !important;
+                z-index: auto !important;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+                position: relative !important;
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
+                transition: flex 0.4s ease, height 0.4s ease;
+            }
+
+            .mobile-filter-bar .filter-label {
+                font-size: 12px;
+                font-weight: 600;
+                color: #8A9AA8;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 4px 0 4px 2px;
+                flex-shrink: 0;
+            }
+            .mobile-filter-bar .filter-row {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+                margin-bottom: 6px;
+                flex-shrink: 0;
+            }
+            .mobile-filter-bar .filter-row.price-row,
+            .mobile-filter-bar .filter-row.star-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .mobile-filter-bar .filter-row.business-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .mobile-filter-bar .cuisine-select-wrapper {
+                margin-top: 0;
+                padding-bottom: 4px;
+                flex-shrink: 0;
+            }
+            .mobile-filter-bar .cuisine-select-wrapper select {
+                padding: 6px 10px;
+                font-size: 13px;
+                border-radius: 16px;
+                background: #F5F6F8;
+                border: 1.5px solid #D0D7DE;
+                width: 100%;
+            }
+            /* 手機版適合談生意按鈕樣式 */
+            .mobile-filter-bar .filter-tag.business {
+                color: #6C5CE7;
+            }
+            .mobile-filter-bar .filter-tag.business.active {
+                background: #EDE7F6;
+                border-color: #6C5CE7;
+                color: #6C5CE7;
+            }
+
+            /* 折疊按鈕在手機上調整 */
+            .toggle-map-btn {
+                position: absolute !important;
+                top: 12px !important;
+                right: 12px !important;
+                width: 36px !important;
+                height: 36px !important;
+                font-size: 16px !important;
+            }
+
+            .locate-btn {
+                bottom: 20px !important;
+                right: 16px !important;
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 20px !important;
+                z-index: 500 !important;
+            }
+            .locate-status {
+                bottom: 80px !important;
+                right: 16px !important;
+                font-size: 13px !important;
+                padding: 6px 16px !important;
+                z-index: 500 !important;
+            }
+
+            /* 手機全屏 Modal */
+            .modal-overlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: #FFFFFF !important;
+                backdrop-filter: none !important;
+                align-items: stretch !important;
+                justify-content: stretch !important;
+                padding: 0 !important;
+                display: none !important;
+                z-index: 2000 !important;
+            }
+            .modal-overlay.open {
+                display: flex !important;
+            }
+            .modal {
+                max-width: 100% !important;
+                width: 100% !important;
+                height: 100% !important;
+                max-height: 100% !important;
+                border-radius: 0 !important;
+                padding: 20px 18px 30px !important;
+                box-shadow: none !important;
+                animation: none !important;
+                overflow-y: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background: #FFFFFF !important;
+                margin: 0 !important;
+                position: relative;
+            }
+            .modal .modal-close-top {
+                display: flex !important;
+                justify-content: flex-end;
+                margin-bottom: 12px;
+                flex-shrink: 0;
+            }
+            .modal .modal-close-top button {
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #8A9AA8;
+                padding: 8px;
+                cursor: pointer;
+                line-height: 1;
+            }
+            .modal .modal-close-top button:hover {
+                color: #1A1A1A;
+            }
+            .modal h2 {
+                font-size: 18px;
+                margin-bottom: 12px;
+                flex-shrink: 0;
+            }
+            .modal .form-group {
+                margin-bottom: 10px;
+            }
+            .modal .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .modal .business-checkbox-group {
+                gap: 12px;
+            }
+            .modal .modal-actions {
+                margin-top: 16px;
+                padding-top: 12px;
+                flex-shrink: 0;
+            }
+            .modal .btn#closeAddBtn {
+                background: #F0F2F5;
+                color: #1A1A1A;
+            }
+            .modal .btn-success {
+                width: auto;
+                padding: 8px 20px;
+            }
         }
 
-        .app-body {
-            display: flex;
-            flex-direction: column;
-            height: calc(100dvh - 56px);
-            overflow: hidden;
-            padding-bottom: 50dvh !important;  /* 關鍵：預留 filter 空間 */
-        }
-
-        .map-container {
-            flex: 1;
-            min-height: 0;
-            width: 100%;
-            position: relative;
-        }
-        #map {
-            height: 100%;
-            width: 100%;
-        }
-
-        /* 手機底部 Filter Bar - 強制顯示與定位 */
-        .mobile-filter-bar {
-            display: block !important;
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            height: 50dvh !important;
-            max-height: none !important;
-            overflow-y: auto !important;
-            background: #FFFFFF !important;
-            border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
-            padding: 8px 12px 12px !important;
-            z-index: 100 !important;  /* 提高層級，確保不被地圖蓋住 */
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
-        }
-
-        .mobile-filter-bar .filter-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #8A9AA8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 4px 0 4px 2px;
-        }
-        .mobile-filter-bar .filter-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-bottom: 6px;
-        }
-        .mobile-filter-bar .filter-row.price-row,
-        .mobile-filter-bar .filter-row.star-row {
-            grid-template-columns: repeat(4, 1fr);
-        }
-        .mobile-filter-bar .cuisine-select-wrapper {
-            margin-top: 0;
-            padding-bottom: 4px;
-        }
-        .mobile-filter-bar .cuisine-select-wrapper select {
-            padding: 6px 10px;
-            font-size: 13px;
-            border-radius: 16px;
-            background: #F5F6F8;
-            border: 1.5px solid #D0D7DE;
-            width: 100%;
-        }
-
-        .locate-btn {
-            bottom: calc(50dvh + 20px);
-            right: 16px;
-            width: 48px;
-            height: 48px;
-            font-size: 20px;
-        }
-        .locate-status {
-            bottom: calc(50dvh + 80px);
-            right: 16px;
-            font-size: 13px;
-            padding: 6px 16px;
-        }
-
-        /* 手機全屏 Modal 樣式（保持不變） */
-        .modal-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: #FFFFFF !important;
-            backdrop-filter: none !important;
-            align-items: stretch !important;
-            justify-content: stretch !important;
-            padding: 0 !important;
-            display: none !important;
-            z-index: 2000 !important;
-        }
-        .modal-overlay.open {
-            display: flex !important;
-        }
-        .modal {
-            max-width: 100% !important;
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 100% !important;
-            border-radius: 0 !important;
-            padding: 20px 18px 30px !important;
-            box-shadow: none !important;
-            animation: none !important;
-            overflow-y: auto !important;
-            display: flex !important;
-            flex-direction: column !important;
-            background: #FFFFFF !important;
-            margin: 0 !important;
-            position: relative;
-        }
-        .modal .modal-close-top {
-            display: flex !important;
-            justify-content: flex-end;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-        .modal .modal-close-top button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #8A9AA8;
-            padding: 8px;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .modal .modal-close-top button:hover {
-            color: #1A1A1A;
-        }
-        .modal h2 {
-            font-size: 18px;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-        .modal .form-group {
-            margin-bottom: 10px;
-        }
-        .modal .form-row {
-            flex-direction: column;
-            gap: 0;
-        }
-        .modal .modal-actions {
-            margin-top: 16px;
-            padding-top: 12px;
-            flex-shrink: 0;
-        }
-        .modal .btn#closeAddBtn {
-            background: #F0F2F5;
-            color: #1A1A1A;
-        }
-        .modal .btn-success {
-            width: auto;
-            padding: 8px 20px;
-        }
-    }
-
+        /* ---------- 桌面版折疊 ---------- */
         @media (min-width: 769px) {
             .mobile-filter-bar {
                 display: none !important;
@@ -869,6 +1025,17 @@
             }
             .modal .modal-close-top {
                 display: none !important;
+            }
+
+            /* 桌面折疊：地圖縮小至 0 */
+            .app-body.map-collapsed .map-container {
+                flex: 0 0 0 !important;
+                overflow: hidden !important;
+                width: 0 !important;
+                min-width: 0 !important;
+            }
+            .app-body.map-collapsed .sidebar {
+                flex: 1 !important;
             }
         }
 
@@ -893,8 +1060,11 @@
             </div>
         </header>
 
-        <div class="app-body">
-            <!-- 側邊欄 -->
+        <div class="app-body" id="appBody">
+            <!-- 折疊按鈕 (獨立於地圖容器) -->
+            <button class="toggle-map-btn" id="toggleMapBtn" title="折疊/展開地圖">▲</button>
+
+            <!-- 側邊欄 (桌面) -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-scroll">
                     <div class="sidebar-section">
@@ -925,7 +1095,6 @@
                             <select id="cuisineSelectDesktop">
                                 <option value="all">全部</option>
                                 <option value="港式">港式</option>
-                                <option value="海鮮">海鮮</option>
                                 <option value="中菜">中菜</option>
                                 <option value="粵菜">粵菜</option>
                                 <option value="台灣菜">台灣菜</option>
@@ -936,7 +1105,17 @@
                                 <option value="意大利菜">意大利菜</option>
                                 <option value="法國菜">法國菜</option>
                                 <option value="西餐">西餐</option>
+                                <option value="火鍋">火鍋</option>
                             </select>
+                        </div>
+                    </div>
+                    <!-- 適合談生意 (桌面) -->
+                    <div class="sidebar-section">
+                        <h3>💼 適合談生意</h3>
+                        <div class="filter-group" id="businessFilter">
+                            <span class="filter-tag business" data-business="capacity">👥 人數足夠</span>
+                            <span class="filter-tag business" data-business="environment">🏢 環境體面</span>
+                            <span class="filter-tag business" data-business="noise">🔇 隔音良好</span>
                         </div>
                     </div>
                 </div>
@@ -946,7 +1125,7 @@
             </aside>
 
             <!-- 地圖 -->
-            <div class="map-container">
+            <div class="map-container" id="mapContainer">
                 <div id="map"></div>
                 <div class="locate-status" id="locateStatus">📍 定位中...</div>
                 <button class="locate-btn" id="locateBtn" title="定位到我">📍</button>
@@ -985,7 +1164,15 @@
                         <option value="意大利菜">意大利菜</option>
                         <option value="法國菜">法國菜</option>
                         <option value="西餐">西餐</option>
+                        <option value="火鍋">火鍋</option>
                     </select>
+                </div>
+                <!-- 適合談生意 (手機) -->
+                <div class="filter-label">💼 適合談生意</div>
+                <div class="filter-row business-row" id="mobileBusinessFilter">
+                    <span class="filter-tag business" data-business="capacity">👥 人數</span>
+                    <span class="filter-tag business" data-business="environment">🏢 環境</span>
+                    <span class="filter-tag business" data-business="noise">🔇 隔音</span>
                 </div>
             </div>
         </div>
@@ -1054,6 +1241,7 @@
                         <option value="意大利菜">意大利菜</option>
                         <option value="法國菜">法國菜</option>
                         <option value="西餐">西餐</option>
+                        <option value="火鍋">火鍋</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1080,6 +1268,24 @@
                     <label>評論 / 備註</label>
                     <textarea id="fComment" placeholder="分享你的用餐體驗..."></textarea>
                 </div>
+                <!-- 適合談生意參數 (3個 checkbox) -->
+                <div class="form-group">
+                    <label>適合談生意</label>
+                    <div class="business-checkbox-group">
+                        <label>
+                            <input type="checkbox" id="fBusinessCapacity" />
+                            👥 人數足夠
+                        </label>
+                        <label>
+                            <input type="checkbox" id="fBusinessEnvironment" />
+                            🏢 環境體面
+                        </label>
+                        <label>
+                            <input type="checkbox" id="fBusinessNoise" />
+                            🔇 隔音良好
+                        </label>
+                    </div>
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn" id="closeAddBtn">取消</button>
                     <button type="submit" class="btn btn-success">✓ 新增餐廳</button>
@@ -1090,7 +1296,7 @@
 
 
     <!-- ============================================================
-    JavaScript (ES Module) - 最新修正版 (含關閉修復)
+    JavaScript (ES Module)
     ============================================================ -->
     <script type="module">
         // =============================================================
@@ -1195,10 +1401,10 @@
             [22.56, 114.40]
         ];
 
-        const CUISINES = ['港式', '中菜','海鮮', '粵菜', '台灣菜', '日本菜', '韓國菜', '泰國菜', '亞洲菜', '意大利菜', '法國菜', '西餐'];
+        const CUISINES = ['港式', '中菜', '粵菜', '台灣菜', '日本菜', '韓國菜', '泰國菜', '亞洲菜', '意大利菜', '法國菜', '西餐', '火鍋'];
 
         // =============================================================
-        // 5. 預設範例資料 (已轉為3星制)
+        // 5. 預設範例資料 (含 business 參數)
         // =============================================================
 
         function convertRating(oldRating) {
@@ -1222,14 +1428,15 @@
             recommender: '美食家 A',
             lat: 22.2871,
             lng: 114.1586,
-            comments: [{ text: '非常棒的體驗！', timestamp: '2026-08-01 14:30', recommender: '陳先生' }]
+            comments: [{ text: '非常棒的體驗！', timestamp: '2026-08-01 14:30', recommender: '陳先生' }],
+            business: { capacity: true, environment: true, noise: true }
         }, {
             id: 'r2',
             name: '添好運 (深水埗)',
             district: '深水埗區',
             price: 'low',
             rating: 3,
-            cuisine: '粵菜',
+            cuisine: '粵菜點心',
             location: '深水埗福榮街9-11號地下',
             phone: '+852 2788 1226',
             hours: '10:00-21:30',
@@ -1238,7 +1445,8 @@
             recommender: '陳小明',
             lat: 22.3312,
             lng: 114.1628,
-            comments: [{ text: '每次去都要排隊！', timestamp: '2026-07-30 12:20', recommender: '張太' }]
+            comments: [{ text: '每次去都要排隊！', timestamp: '2026-07-30 12:20', recommender: '張太' }],
+            business: { capacity: false, environment: false, noise: false }
         }, {
             id: 'r3',
             name: '一樂燒鵝',
@@ -1254,7 +1462,8 @@
             recommender: '',
             lat: 22.2829,
             lng: 114.1579,
-            comments: []
+            comments: [],
+            business: { capacity: false, environment: false, noise: false }
         }, {
             id: 'r4',
             name: '甘牌燒鵝',
@@ -1270,7 +1479,8 @@
             recommender: '張先生',
             lat: 22.2783,
             lng: 114.1779,
-            comments: []
+            comments: [],
+            business: { capacity: false, environment: false, noise: false }
         }, {
             id: 'r5',
             name: '九記牛腩',
@@ -1286,14 +1496,15 @@
             recommender: '',
             lat: 22.2853,
             lng: 114.1547,
-            comments: []
+            comments: [],
+            business: { capacity: false, environment: false, noise: false }
         }, {
             id: 'r6',
             name: '澳洲牛奶公司',
             district: '油尖旺區',
             price: 'low',
             rating: 3,
-            cuisine: '港式',
+            cuisine: '港式茶餐廳',
             location: '佐敦白加士街47-49號地下',
             phone: '+852 2730 1356',
             hours: '07:30-23:00',
@@ -1302,7 +1513,8 @@
             recommender: '李太',
             lat: 22.3054,
             lng: 114.1714,
-            comments: []
+            comments: [],
+            business: { capacity: false, environment: false, noise: false }
         }, {
             id: 'r7',
             name: '鏞記酒家',
@@ -1318,14 +1530,15 @@
             recommender: '',
             lat: 22.2837,
             lng: 114.1570,
-            comments: []
+            comments: [],
+            business: { capacity: true, environment: true, noise: false }
         }, {
             id: 'r8',
             name: '蓮香樓',
             district: '中西區',
             price: 'low',
             rating: 2,
-            cuisine: '粵菜',
+            cuisine: '粵菜點心',
             location: '中環威靈頓街160-164號',
             phone: '+852 2544 4556',
             hours: '06:00-22:00',
@@ -1334,14 +1547,15 @@
             recommender: '',
             lat: 22.2844,
             lng: 114.1543,
-            comments: []
+            comments: [],
+            business: { capacity: false, environment: false, noise: false }
         }, {
             id: 'r9',
             name: '阿甘蝦餐廳',
             district: '南區',
             price: 'medium',
             rating: 2,
-            cuisine: '海鮮',
+            cuisine: '美式海鮮',
             location: '香港仔海傍道8號',
             phone: '+852 2552 8866',
             hours: '11:00-23:00',
@@ -1350,7 +1564,8 @@
             recommender: '食客王',
             lat: 22.2483,
             lng: 114.1535,
-            comments: []
+            comments: [],
+            business: { capacity: true, environment: true, noise: false }
         }, {
             id: 'r10',
             name: '大班樓',
@@ -1366,7 +1581,8 @@
             recommender: '',
             lat: 22.2847,
             lng: 114.1554,
-            comments: []
+            comments: [],
+            business: { capacity: true, environment: true, noise: true }
         }];
 
         // =============================================================
@@ -1387,6 +1603,8 @@
                     if (raw.rating > 3) raw.rating = convertRating(raw.rating);
                     if (!raw.hasOwnProperty('recommender')) raw.recommender = '';
                     if (!raw.hasOwnProperty('comments') || !Array.isArray(raw.comments)) raw.comments = [];
+                    if (!raw.hasOwnProperty('business')) raw.business = { capacity: false, environment: false,
+                        noise: false };
                     data.push(raw);
                 });
                 localStorage.setItem('hk_restaurants', JSON.stringify(data));
@@ -1450,6 +1668,8 @@
         let activePrice = 'all';
         let activeStars = 'all';
         let activeCuisine = 'all';
+        let filterBusiness = { capacity: false, environment: false, noise: false };
+
         let currentPopupRestaurantId = null;
         let focusCommentOnOpen = false;
 
@@ -1482,6 +1702,10 @@
             document.getElementById('locateBtn').addEventListener('click', doLocate);
             setupLocateEvents();
             setupCuisineFilters();
+            setupBusinessFilters();
+
+            // 地圖折疊按鈕
+            document.getElementById('toggleMapBtn').addEventListener('click', toggleMap);
         }
 
         // =============================================================
@@ -1553,14 +1777,23 @@
         }
 
         // =============================================================
-        // 11. 構建彈窗內容 (與之前相同，省略以節省篇幅)
-        // 此處需保留但為了完整，簡化為僅顯示名稱和評論
+        // 11. 構建彈窗內容 (含 Business 參數)
         // =============================================================
 
         function buildInfoWindowContent(r) {
             const stars = '★'.repeat(r.rating) + '☆'.repeat(3 - r.rating);
             const priceLabel = PRICE_LABELS[r.price] || r.price;
             const priceClass = r.price;
+
+            const biz = r.business || { capacity: false, environment: false, noise: false };
+            const bizHtml = `
+                <div class="iw-business">
+                    <span class="${biz.capacity ? 'yes' : 'no'}">${biz.capacity ? '✅' : '❌'} 人數足夠</span>
+                    <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
+                    <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音良好</span>
+                </div>
+            `;
+
             let html = `
                 <div class="info-window" data-restaurant-id="${r.id}">
                     <div class="iw-name">${escapeHtml(r.name)}</div>
@@ -1586,6 +1819,9 @@
             if (r.image) {
                 html += `<div style="margin-top:6px;"><img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.name)}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'" /></div>`;
             }
+
+            html += bizHtml;
+
             html += `<div class="iw-comments">`;
             html += `<div style="font-weight:600;font-size:14px;margin-bottom:6px;">💬 評論 (${r.comments ? r.comments.length : 0})</div>`;
             if (r.comments && r.comments.length > 0) {
@@ -1614,7 +1850,7 @@
             return html;
         }
 
-        // 評論提交事件（簡化版，與之前相同）
+        // 評論提交事件
         function bindCommentForm(popupContainer, restaurantId) {
             const form = popupContainer.querySelector('.iw-comment-form');
             if (!form) return;
@@ -1756,7 +1992,7 @@
         }
 
         // =============================================================
-        // 13. 過濾邏輯
+        // 13. 過濾邏輯 (含適合談生意)
         // =============================================================
 
         function getFilteredRestaurants() {
@@ -1769,6 +2005,12 @@
                 if (activePrice !== 'all' && r.price !== activePrice) return false;
                 if (activeStars !== 'all' && r.rating !== parseInt(activeStars)) return false;
                 if (activeCuisine !== 'all' && r.cuisine !== activeCuisine) return false;
+
+                const biz = r.business || { capacity: false, environment: false, noise: false };
+                if (filterBusiness.capacity && !biz.capacity) return false;
+                if (filterBusiness.environment && !biz.environment) return false;
+                if (filterBusiness.noise && !biz.noise) return false;
+
                 return true;
             });
         }
@@ -1789,6 +2031,13 @@
                 const stars = '★'.repeat(r.rating) + '☆'.repeat(3 - r.rating);
                 const priceClass = r.price;
                 const priceLabel = PRICE_LABELS[r.price] || r.price;
+                const biz = r.business || { capacity: false, environment: false, noise: false };
+                const bizTags =
+                    `<div class="business-tags">
+                        <span class="${biz.capacity ? 'yes' : 'no'}">${biz.capacity ? '✅' : '❌'} 人數</span>
+                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境</span>
+                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音</span>
+                    </div>`;
                 html += `
                     <div class="restaurant-card" data-id="${r.id}">
                         <div class="name">${escapeHtml(r.name)}</div>
@@ -1798,6 +2047,7 @@
                             <span class="district-label">${escapeHtml(r.district)}</span>
                             ${r.cuisine ? `<span class="cuisine-type">${escapeHtml(r.cuisine)}</span>` : ''}
                         </div>
+                        ${bizTags}
                         ${r.comment ? `<div class="comment-preview">💬 ${escapeHtml(r.comment)}</div>` : ''}
                         <div style="font-size:11px;color:#8A9AA8;margin-top:2px;">📍 ${escapeHtml(r.location || '地址待補')}</div>
                         ${r.recommender ? `<div class="recommender">👤 推薦者：${escapeHtml(r.recommender)}</div>` : ''}
@@ -1952,7 +2202,7 @@
         }
 
         // =============================================================
-        // 17. 品類下拉選單的監聽
+        // 17. 品類下拉選單的監聽 (含火鍋)
         // =============================================================
 
         function setupCuisineFilters() {
@@ -1974,7 +2224,62 @@
         }
 
         // =============================================================
-        // 18. 新增餐廳 (含全面關閉處理)
+        // 18. 適合談生意篩選按鈕
+        // =============================================================
+
+        function setupBusinessFilters() {
+            const desktopContainer = document.getElementById('businessFilter');
+            const mobileContainer = document.getElementById('mobileBusinessFilter');
+
+            function handleBusinessToggle(element) {
+                const field = element.dataset.business;
+                element.classList.toggle('active');
+                filterBusiness[field] = element.classList.contains('active');
+                const otherContainer = element.closest('.filter-group') ? mobileContainer : desktopContainer;
+                const target = otherContainer.querySelector(`[data-business="${field}"]`);
+                if (target) {
+                    target.classList.toggle('active', filterBusiness[field]);
+                }
+                renderMarkers();
+            }
+
+            desktopContainer.querySelectorAll('.filter-tag.business').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    handleBusinessToggle(this);
+                });
+            });
+            mobileContainer.querySelectorAll('.filter-tag.business').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    handleBusinessToggle(this);
+                });
+            });
+        }
+
+        // =============================================================
+        // 19. 地圖折疊/展開功能
+        // =============================================================
+
+        function toggleMap() {
+            const appBody = document.getElementById('appBody');
+            const btn = document.getElementById('toggleMapBtn');
+            appBody.classList.toggle('map-collapsed');
+            if (appBody.classList.contains('map-collapsed')) {
+                btn.innerHTML = '▼';
+                btn.title = '展開地圖';
+            } else {
+                btn.innerHTML = '▲';
+                btn.title = '折疊地圖';
+            }
+            // 觸發地圖 resize 事件，讓 Leaflet 正確調整大小
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+            }, 400);
+        }
+
+        // =============================================================
+        // 20. 新增餐廳 (含 Business 參數)
         // =============================================================
 
         function setupAddForm() {
@@ -1989,7 +2294,10 @@
             const pwdInput = document.getElementById('fPassword');
             const pwdError = document.getElementById('pwdError');
 
-            // 地區選項
+            const capacityCheck = document.getElementById('fBusinessCapacity');
+            const environmentCheck = document.getElementById('fBusinessEnvironment');
+            const noiseCheck = document.getElementById('fBusinessNoise');
+
             const optOther = document.createElement('option');
             optOther.value = 'other';
             optOther.textContent = '其他 (自訂)';
@@ -2010,19 +2318,19 @@
                 }
             });
 
-            // 關閉 modal 的通用函數
             function closeModal() {
                 modal.classList.remove('open');
                 form.reset();
                 pwdError.classList.remove('show');
                 pwdInput.value = '';
                 customDistrictGroup.style.display = 'none';
-                // 重設提交按鈕文字（若之前改過）
+                capacityCheck.checked = false;
+                environmentCheck.checked = false;
+                noiseCheck.checked = false;
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) submitBtn.textContent = '✓ 新增餐廳';
             }
 
-            // 開啟 modal
             openBtn.addEventListener('click', () => {
                 modal.classList.add('open');
                 if (activeDistrict && activeDistrict !== 'other') {
@@ -2034,22 +2342,17 @@
                 document.getElementById('fName').focus();
                 pwdInput.value = '';
                 pwdError.classList.remove('show');
+                capacityCheck.checked = false;
+                environmentCheck.checked = false;
+                noiseCheck.checked = false;
             });
 
-            // 關閉按鈕（底部的「取消」）
             closeBtn.addEventListener('click', closeModal);
-
-            // 手機版頂部關閉按鈕
             closeTopBtn.addEventListener('click', closeModal);
-
-            // 點擊背景關閉（但手機版是白色背景，點擊無效，保留給桌面版）
             modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeModal();
-                }
+                if (e.target === modal) closeModal();
             });
 
-            // 表單提交
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -2074,26 +2377,19 @@
                 const image = document.getElementById('fImage').value.trim();
                 const comment = document.getElementById('fComment').value.trim();
 
-                if (!cuisine) {
-                    alert('請選擇品類');
-                    document.getElementById('fCuisine').focus();
-                    return;
-                }
+                const business = {
+                    capacity: capacityCheck.checked,
+                    environment: environmentCheck.checked,
+                    noise: noiseCheck.checked
+                };
 
+                if (!cuisine) { alert('請選擇品類'); document.getElementById('fCuisine').focus(); return; }
                 if (district === 'other') {
                     const custom = customDistrictInput.value.trim();
-                    if (!custom) {
-                        alert('請輸入自訂地區名稱。');
-                        customDistrictInput.focus();
-                        return;
-                    }
+                    if (!custom) { alert('請輸入自訂地區名稱。'); customDistrictInput.focus(); return; }
                     district = custom;
-                } else if (!district) {
-                    alert('請選擇地區。');
-                    return;
-                }
+                } else if (!district) { alert('請選擇地區。'); return; }
 
-                // 驗證省略（與之前相同，此處簡化）
                 if (!isValidName(name)) { alert('名稱需1~50字'); document.getElementById('fName').focus(); return; }
                 if (!['high', 'medium', 'low'].includes(price)) { alert('價格錯誤'); return; }
                 if (![1, 2, 3].includes(rating)) { alert('評分錯誤'); return; }
@@ -2104,7 +2400,6 @@
                 if (recommender.length > 30) { alert('推薦者過長'); document.getElementById('fRecommender').focus(); return; }
                 if (comment.length > 500) { alert('評論過長'); document.getElementById('fComment').focus(); return; }
 
-                // 產生經緯度
                 const baseCoords = {
                     '中西區': { lat: 22.285, lng: 114.155 },
                     '灣仔區': { lat: 22.278, lng: 114.178 },
@@ -2144,12 +2439,12 @@
                     comment,
                     lat,
                     lng,
-                    comments: []
+                    comments: [],
+                    business: business
                 };
 
                 restaurants.push(newRestaurant);
 
-                // 顯示提交中狀態
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const origText = submitBtn.textContent;
                 submitBtn.textContent = '⏳ 儲存中...';
@@ -2161,9 +2456,7 @@
                     await signOut(auth);
 
                     if (result) {
-                        // 成功！關閉 modal
                         closeModal();
-                        // 更新地圖
                         if (DISTRICTS.includes(district)) {
                             activeDistrict = district;
                             document.querySelectorAll('.district-tag').forEach(el => {
@@ -2178,21 +2471,16 @@
                             syncMobileDistrict('other');
                         }
                         renderMarkers();
-                        // 簡單反饋
-                        setTimeout(() => {
-                            alert('✅ 餐廳已新增！');
-                        }, 300);
+                        setTimeout(() => alert('✅ 餐廳已新增！'), 300);
                     } else {
-                        // 儲存失敗但未拋出錯誤
-                        restaurants.pop(); // 復原
+                        restaurants.pop();
                         alert('❌ 儲存失敗，請稍後再試');
                     }
                 } catch (error) {
                     console.error('儲存失敗:', error);
-                    restaurants.pop(); // 復原
+                    restaurants.pop();
                     alert('❌ 儲存失敗，請檢查網路或 Firebase 設定');
                 } finally {
-                    // 恢復按鈕狀態
                     submitBtn.textContent = origText;
                     submitBtn.disabled = false;
                 }
@@ -2200,7 +2488,7 @@
         }
 
         // =============================================================
-        // 19. 啟動
+        // 21. 啟動
         // =============================================================
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -2209,7 +2497,7 @@
             setupFilters();
             setupAddForm();
 
-            console.log('🍜 HW 飲食地圖已啟動 (手機版關閉修復)');
+            console.log('🍜 HW 飲食地圖已啟動 (折疊按鈕修正)');
             console.log('📌 管理密碼:', STATIC_PASSWORD);
         });
     </script>
