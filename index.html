@@ -1502,6 +1502,12 @@
             </div>
             <h2>➕ 新增餐廳</h2>
             <form id="addForm" autocomplete="off">
+                <!-- Password -->
+                <div class="form-group">
+                    <label>管理員密碼 *</label>
+                    <input type="password" id="fPassword" placeholder="請輸入管理密碼" required />
+                    <div class="error-msg" id="pwdError">密碼錯誤，請重新輸入</div>
+                </div>
                 <!-- 餐廳名稱 -->
                 <div class="form-group">
                     <label>餐廳名稱 *</label>
