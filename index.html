@@ -16,7 +16,7 @@
 
     <style>
         /* ============================================================
-           全域樣式 (完整保留，與先前版本相同)
+           全域樣式 (完整保留)
            ============================================================ */
         * {
             margin: 0;
@@ -886,6 +886,41 @@
         .modal .geocode-status.loading {
             color: #FFA502;
         }
+        /* 地址搜尋建議下拉 */
+        .address-suggestions {
+            position: absolute;
+            background: #FFFFFF;
+            border: 1px solid #D0D7DE;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            width: calc(100% - 80px);
+            margin-top: 2px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+        .address-suggestions .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #F1F3F5;
+            transition: background 0.15s;
+        }
+        .address-suggestions .suggestion-item:hover {
+            background: #EEF4FE;
+        }
+        .address-suggestions .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .address-suggestions .suggestion-item .suggestion-name {
+            font-weight: 500;
+            color: #1A1A1A;
+        }
+        .address-suggestions .suggestion-item .suggestion-addr {
+            font-size: 12px;
+            color: #8A9AA8;
+        }
 
         /* ============================================================
            手機版
@@ -1426,19 +1461,26 @@
     <!-- ===== 新增餐廳模態框 ===== -->
     <div class="modal-overlay" id="addModal">
         <div class="modal">
+            <!-- 只有右上角 X 可關閉 -->
             <div class="modal-close-top">
                 <button id="closeModalTopBtn" aria-label="關閉">✕</button>
             </div>
             <h2>➕ 新增餐廳</h2>
             <form id="addForm" autocomplete="off">
-                <div class="form-group">
-                    <label>管理員密碼 *</label>
-                    <input type="password" id="fPassword" placeholder="請輸入管理密碼" required />
-                    <div class="error-msg" id="pwdError">密碼錯誤，請重新輸入</div>
-                </div>
+                <!-- 餐廳名稱 (輸入時觸發地址搜尋) -->
                 <div class="form-group">
                     <label>餐廳名稱 *</label>
-                    <input type="text" id="fName" placeholder="例：龍景軒" required />
+                    <input type="text" id="fName" placeholder="例：君悅酒店" required />
+                </div>
+                <div class="form-group" style="position:relative;">
+                    <label>地址 / 位置 *</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="fLocation" placeholder="自動搜尋或手動輸入" required style="flex:1;" />
+                        <button type="button" class="btn-geocode" id="geocodeBtn">📍 定位</button>
+                    </div>
+                    <!-- 地址建議下拉 -->
+                    <div class="address-suggestions" id="addressSuggestions"></div>
+                    <div class="geocode-status" id="geocodeStatus">💡 輸入餐廳名稱會自動搜尋地址</div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1492,15 +1534,7 @@
                         <option value="其他">其他</option>
                     </select>
                 </div>
-                <!-- 地址 + 定位按鈕 -->
-                <div class="form-group">
-                    <label>地址 / 位置 *</label>
-                    <div style="display:flex; gap:8px;">
-                        <input type="text" id="fLocation" placeholder="灣仔港灣道1號君悅酒店大堂" required style="flex:1;" />
-                        <button type="button" class="btn-geocode" id="geocodeBtn">📍 定位</button>
-                    </div>
-                    <div class="geocode-status" id="geocodeStatus">💡 輸入地址後點擊「定位」自動取得座標</div>
-                </div>
+                <!-- 經緯度 (自動填入) -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>緯度 (Latitude)</label>
@@ -1553,7 +1587,7 @@
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn" id="closeAddBtn">取消</button>
+                    <button type="button" class="btn" id="closeAddBtn" style="display:none;">取消</button>
                     <button type="submit" class="btn btn-success">✓ 新增餐廳</button>
                 </div>
             </form>
@@ -1668,11 +1702,9 @@
         ];
 
         // =============================================================
-        // 5. 定義 HK1980 投影參數 (for proj4js)
+        // 5. 定義 HK1980 投影參數
         // =============================================================
 
-        // 在 proj4 全域物件中定義 HK1980 座標系統
-        // 參數來源：地政總署公布的 HK1980 Grid 定義
         window.proj4.defs(
             "HK1980",
             "+proj=tmerc +lat_0=22.31213333333333 +lon_0=114.1785555555556 +k=1 +x_0=836694.05 +y_0=819069.8 +ellps=intl +towgs84=-162.619,-276.959,-161.764,0.067753,-2.65065,1.48355,-1.357 +units=m +no_defs"
@@ -2065,68 +2097,46 @@
         }
 
         // =============================================================
-        // 12. 地址定位功能 (使用 map.gov.hk API + proj4js 轉換)
+        // 12. 地址搜尋與定位功能 (支援地區過濾)
         // =============================================================
 
-        async function searchAddressAndGetCoordinates(address, targetDistrict) {
+        // 搜尋地址 (回傳前5筆結果，並根據地區過濾)
+        async function searchAddress(query, districtFilter) {
+            if (!query || query.length < 2) return [];
             try {
-                // 1. 直接呼叫 map.gov.hk API (無需代理)
-                const searchUrl =
-                    `https://www.map.gov.hk/gs/api/v1.0.0/locationSearch?q=${encodeURIComponent(address)}`;
-                const response = await fetch(searchUrl);
-
-                if (!response.ok) {
-                    throw new Error(`API 請求失敗: ${response.status}`);
-                }
-
+                const url =
+                    `https://www.map.gov.hk/gs/api/v1.0.0/locationSearch?q=${encodeURIComponent(query)}`;
+                const response = await fetch(url);
+                if (!response.ok) return [];
                 const data = await response.json();
+                if (!data || data.length === 0) return [];
 
-                // 2. 檢查結果
-                if (!data || data.length === 0) {
-                    return { error: '找不到該地址，請檢查後重試' };
-                }
-
-                // 3. 過濾結果（若指定地區）
+                // 過濾：若 districtFilter 有值且不是 'other'，則只保留匹配地區的結果
                 let filtered = data;
-                if (targetDistrict) {
-                    filtered = data.filter(item => item.districtZH === targetDistrict);
+                if (districtFilter && districtFilter !== '' && districtFilter !== 'other') {
+                    filtered = data.filter(item => item.districtZH === districtFilter);
                 }
-                if (filtered.length === 0) {
-                    filtered = data.slice(0, 1);
-                }
-
-                const result = filtered[0];
-                const hkX = result.x;
-                const hkY = result.y;
-
-                if (!hkX || !hkY) {
-                    return { error: '結果缺少座標資訊' };
-                }
-
-                // 4. 使用 proj4js 將 HK1980 轉為 WGS84
-                const wgs84 = window.proj4('HK1980', 'WGS84', [hkX, hkY]);
-
-                if (!wgs84 || wgs84.length < 2) {
-                    return { error: '座標轉換失敗' };
-                }
-
-                return {
-                    lat: wgs84[1], // proj4 回傳 [lng, lat]
-                    lng: wgs84[0],
-                    district: result.districtZH,
-                    name: result.nameZH || result.nameEN || '搜尋結果',
-                    address: result.addressZH || result.addressEN || address,
-                    raw: result
-                };
-
+                // 取前5筆，並過濾空名稱或空地址
+                return filtered.slice(0, 5).filter(item => item.nameZH || item.addressZH);
             } catch (error) {
-                console.error('地址搜尋或轉換失敗:', error);
-                return { error: '連線失敗，請稍後重試。' };
+                console.error('地址搜尋失敗:', error);
+                return [];
+            }
+        }
+
+        // 將 HK1980 轉為 WGS84
+        function convertHK1980toWGS84(x, y) {
+            try {
+                const result = window.proj4('HK1980', 'WGS84', [x, y]);
+                return { lat: result[1], lng: result[0] };
+            } catch (e) {
+                console.error('座標轉換失敗:', e);
+                return null;
             }
         }
 
         // =============================================================
-        // 13. 構建彈窗內容
+        // 13. 構建彈窗內容 (同前)
         // =============================================================
 
         function buildInfoWindowContent(r) {
@@ -2207,7 +2217,7 @@
             return html;
         }
 
-        // 評論提交事件
+        // 評論提交事件 (同前)
         function bindCommentForm(popupContainer, restaurantId) {
             const form = popupContainer.querySelector('.iw-comment-form');
             if (!form) return;
@@ -2291,7 +2301,7 @@
         }
 
         // =============================================================
-        // 14. 渲染標記
+        // 14. 渲染標記 (同前)
         // =============================================================
 
         function renderMarkers() {
@@ -2352,7 +2362,7 @@
         }
 
         // =============================================================
-        // 15. 過濾邏輯
+        // 15. 過濾邏輯 (同前)
         // =============================================================
 
         function getFilteredRestaurants() {
@@ -2381,7 +2391,7 @@
         }
 
         // =============================================================
-        // 16. 側邊欄列表
+        // 16. 側邊欄列表 (同前)
         // =============================================================
 
         function renderList(filtered) {
@@ -2448,7 +2458,7 @@
         }
 
         // =============================================================
-        // 17. 手機版列表
+        // 17. 手機版列表 (同前)
         // =============================================================
 
         function renderMobileList(filtered) {
@@ -2515,7 +2525,7 @@
         }
 
         // =============================================================
-        // 18. 地區按鈕
+        // 18. 地區按鈕 (同前)
         // =============================================================
 
         function renderDistrictButtons() {
@@ -2577,7 +2587,7 @@
         }
 
         // =============================================================
-        // 19. 價格與星級篩選
+        // 19. 價格與星級篩選 (同前)
         // =============================================================
 
         function setupFilters() {
@@ -2640,7 +2650,7 @@
         }
 
         // =============================================================
-        // 20. 品類下拉選單的監聽
+        // 20. 品類下拉選單的監聽 (同前)
         // =============================================================
 
         function setupCuisineFilters() {
@@ -2662,7 +2672,7 @@
         }
 
         // =============================================================
-        // 21. 適合談生意篩選按鈕
+        // 21. 適合談生意篩選按鈕 (同前)
         // =============================================================
 
         function setupBusinessFilters() {
@@ -2694,7 +2704,7 @@
         }
 
         // =============================================================
-        // 22. 推廣時段篩選
+        // 22. 推廣時段篩選 (同前)
         // =============================================================
 
         function setupPeriodFilters() {
@@ -2716,7 +2726,7 @@
         }
 
         // =============================================================
-        // 23. 地圖折疊/展開功能
+        // 23. 地圖折疊/展開功能 (同前)
         // =============================================================
 
         function toggleMap() {
@@ -2742,13 +2752,12 @@
         }
 
         // =============================================================
-        // 24. 新增餐廳 (含定位按鈕)
+        // 24. 新增餐廳 (含地區過濾的自動搜尋)
         // =============================================================
 
         function setupAddForm() {
             const modal = document.getElementById('addModal');
             const openBtn = document.getElementById('openAddBtn');
-            const closeBtn = document.getElementById('closeAddBtn');
             const closeTopBtn = document.getElementById('closeModalTopBtn');
             const form = document.getElementById('addForm');
             const districtSelect = document.getElementById('fDistrict');
@@ -2760,6 +2769,9 @@
             const geocodeStatus = document.getElementById('geocodeStatus');
             const latInput = document.getElementById('fLat');
             const lngInput = document.getElementById('fLng');
+            const nameInput = document.getElementById('fName');
+            const locationInput = document.getElementById('fLocation');
+            const suggestionsDiv = document.getElementById('addressSuggestions');
 
             const envCheck = document.getElementById('fBusinessEnvironment');
             const noiseCheck = document.getElementById('fBusinessNoise');
@@ -2767,6 +2779,9 @@
             const privateRoomCheck = document.getElementById('fBusinessPrivateRoom');
             const periodChecks = document.querySelectorAll('.period-check');
 
+            let searchTimeout = null;
+
+            // 地區選項
             const optOther = document.createElement('option');
             optOther.value = 'other';
             optOther.textContent = '其他 (自訂)';
@@ -2785,11 +2800,109 @@
                 } else {
                     customDistrictGroup.style.display = 'none';
                 }
+                // 地區變更時，若有搜尋結果，可選擇重新搜尋（但我們不自動觸發，用戶需重新輸入或點擊定位）
             });
 
-            // ---------- 定位按鈕 ----------
+            // ---------- 餐廳名稱輸入時自動搜尋地址 (套用地區過濾) ----------
+            nameInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (query.length < 2) {
+                    suggestionsDiv.style.display = 'none';
+                    return;
+                }
+
+                // 取得當前選取的地區（用於過濾）
+                const selectedDistrict = districtSelect.value;
+
+                searchTimeout = setTimeout(async () => {
+                    // 呼叫搜尋，傳入地區過濾
+                    const results = await searchAddress(query, selectedDistrict);
+                    if (results.length === 0) {
+                        suggestionsDiv.style.display = 'none';
+                        // 可顯示提示：無匹配該地區的結果
+                        geocodeStatus.textContent = '💡 無匹配此地區的地址，請調整地區或關鍵字';
+                        geocodeStatus.className = 'geocode-status';
+                        return;
+                    }
+                    // 顯示前5筆結果
+                    let html = '';
+                    results.forEach(item => {
+                        const name = item.nameZH || item.nameEN || '';
+                        const addr = item.addressZH || item.addressEN || '';
+                        html += `
+                            <div class="suggestion-item" data-x="${item.x}" data-y="${item.y}" data-district="${item.districtZH || ''}" data-name="${escapeHtml(name)}" data-address="${escapeHtml(addr)}">
+                                <div class="suggestion-name">${escapeHtml(name)}</div>
+                                <div class="suggestion-addr">${escapeHtml(addr)}</div>
+                            </div>
+                        `;
+                    });
+                    suggestionsDiv.innerHTML = html;
+                    suggestionsDiv.style.display = 'block';
+                    geocodeStatus.textContent = `✅ 找到 ${results.length} 筆結果 (地區：${selectedDistrict || '全部'})`;
+                    geocodeStatus.className = 'geocode-status success';
+
+                    // 點擊建議項目
+                    suggestionsDiv.querySelectorAll('.suggestion-item').forEach(el => {
+                        el.addEventListener('click', function() {
+                            const x = parseFloat(this.dataset.x);
+                            const y = parseFloat(this.dataset.y);
+                            const district = this.dataset.district;
+                            const name = this.dataset.name;
+                            const address = this.dataset.address;
+
+                            locationInput.value = address || name;
+
+                            // 若地區未選，自動填入地區
+                            if (district && districtSelect.value === '') {
+                                const opt = districtSelect.querySelector(
+                                    `option[value="${district}"]`);
+                                if (opt) {
+                                    districtSelect.value = district;
+                                }
+                            }
+
+                            // 轉換座標並填入
+                            if (x && y) {
+                                const coords = convertHK1980toWGS84(x, y);
+                                if (coords) {
+                                    latInput.value = coords.lat.toFixed(6);
+                                    lngInput.value = coords.lng.toFixed(6);
+                                    geocodeStatus.textContent = `✅ 已定位：${name} (${district || ''})`;
+                                    geocodeStatus.className = 'geocode-status success';
+
+                                    if (geocodeMarker) map.removeLayer(geocodeMarker);
+                                    const icon = L.divIcon({
+                                        html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
+                                        className: '',
+                                        iconSize: [24, 24],
+                                        iconAnchor: [12, 12]
+                                    });
+                                    geocodeMarker = L.marker([coords.lat, coords.lng], { icon: icon })
+                                        .addTo(map)
+                                        .bindPopup(`📍 ${escapeHtml(name || '搜尋結果')}`)
+                                        .openPopup();
+                                    map.setView([coords.lat, coords.lng], 16);
+                                }
+                            }
+
+                            suggestionsDiv.style.display = 'none';
+                        });
+                    });
+                }, 400);
+            });
+
+            // 點擊其他地方關閉建議
+            document.addEventListener('click', function(e) {
+                if (!suggestionsDiv.contains(e.target) && e.target !== nameInput) {
+                    suggestionsDiv.style.display = 'none';
+                }
+            });
+
+            // ---------- 定位按鈕 (手動觸發，同樣套用地區過濾) ----------
             geocodeBtn.addEventListener('click', async function() {
-                const address = document.getElementById('fLocation').value.trim();
+                const address = locationInput.value.trim();
                 if (!address) {
                     geocodeStatus.textContent = '⚠️ 請先輸入地址';
                     geocodeStatus.className = 'geocode-status error';
@@ -2813,39 +2926,68 @@
                     geocodeMarker = null;
                 }
 
-                const result = await searchAddressAndGetCoordinates(address, district);
-                geocodeBtn.disabled = false;
-                geocodeBtn.textContent = '📍 定位';
+                try {
+                    const results = await searchAddress(address, district);
+                    if (!results || results.length === 0) {
+                        geocodeStatus.textContent = '❌ 找不到該地址（或該地區無結果）';
+                        geocodeStatus.className = 'geocode-status error';
+                        geocodeBtn.disabled = false;
+                        geocodeBtn.textContent = '📍 定位';
+                        return;
+                    }
 
-                if (result.error) {
-                    geocodeStatus.textContent = '❌ ' + result.error;
+                    // 過濾地區已在 searchAddress 內完成
+                    const result = results[0];
+                    const x = result.x;
+                    const y = result.y;
+                    const name = result.nameZH || result.nameEN || '搜尋結果';
+
+                    if (!x || !y) {
+                        geocodeStatus.textContent = '❌ 結果缺少座標資訊';
+                        geocodeStatus.className = 'geocode-status error';
+                        geocodeBtn.disabled = false;
+                        geocodeBtn.textContent = '📍 定位';
+                        return;
+                    }
+
+                    const coords = convertHK1980toWGS84(x, y);
+                    if (!coords) {
+                        geocodeStatus.textContent = '❌ 座標轉換失敗';
+                        geocodeStatus.className = 'geocode-status error';
+                        geocodeBtn.disabled = false;
+                        geocodeBtn.textContent = '📍 定位';
+                        return;
+                    }
+
+                    latInput.value = coords.lat.toFixed(6);
+                    lngInput.value = coords.lng.toFixed(6);
+
+                    geocodeStatus.textContent = `✅ 已定位：${name} (${result.districtZH || ''})`;
+                    geocodeStatus.className = 'geocode-status success';
+
+                    const icon = L.divIcon({
+                        html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
+                        className: '',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+                    geocodeMarker = L.marker([coords.lat, coords.lng], { icon: icon })
+                        .addTo(map)
+                        .bindPopup(`📍 ${escapeHtml(name)}`)
+                        .openPopup();
+                    map.setView([coords.lat, coords.lng], 16);
+
+                } catch (error) {
+                    console.error('定位失敗:', error);
+                    geocodeStatus.textContent = '❌ 定位失敗，請稍後重試';
                     geocodeStatus.className = 'geocode-status error';
-                    latInput.value = '';
-                    lngInput.value = '';
-                    return;
+                } finally {
+                    geocodeBtn.disabled = false;
+                    geocodeBtn.textContent = '📍 定位';
                 }
-
-                latInput.value = result.lat.toFixed(6);
-                lngInput.value = result.lng.toFixed(6);
-
-                geocodeStatus.textContent =
-                    `✅ 已定位：${result.name} (${result.district || ''})`;
-                geocodeStatus.className = 'geocode-status success';
-
-                const icon = L.divIcon({
-                    html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
-                    className: '',
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
-                });
-                geocodeMarker = L.marker([result.lat, result.lng], { icon: icon })
-                    .addTo(map)
-                    .bindPopup(`📍 ${escapeHtml(result.name || '搜尋結果')}`)
-                    .openPopup();
-                map.setView([result.lat, result.lng], 16);
             });
 
-            // ---------- 關閉 modal ----------
+            // ---------- 關閉 modal (只有右上角 X) ----------
             function closeModal() {
                 modal.classList.remove('open');
                 form.reset();
@@ -2861,7 +3003,8 @@
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
                 }
-                geocodeStatus.textContent = '💡 輸入地址後點擊「定位」自動取得座標';
+                suggestionsDiv.style.display = 'none';
+                geocodeStatus.textContent = '💡 輸入餐廳名稱會自動搜尋地址';
                 geocodeStatus.className = 'geocode-status';
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) submitBtn.textContent = '✓ 新增餐廳';
@@ -2878,7 +3021,7 @@
                     districtSelect.value = '';
                 }
                 customDistrictGroup.style.display = 'none';
-                document.getElementById('fName').focus();
+                nameInput.focus();
                 pwdInput.value = '';
                 pwdError.classList.remove('show');
                 envCheck.checked = false;
@@ -2890,17 +3033,15 @@
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
                 }
-                geocodeStatus.textContent = '💡 輸入地址後點擊「定位」自動取得座標';
+                suggestionsDiv.style.display = 'none';
+                geocodeStatus.textContent = '💡 輸入餐廳名稱會自動搜尋地址';
                 geocodeStatus.className = 'geocode-status';
                 latInput.value = '';
                 lngInput.value = '';
             });
 
-            closeBtn.addEventListener('click', closeModal);
+            // 只有右上角 X 可關閉
             closeTopBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) closeModal();
-            });
 
             // ---------- 表單提交 ----------
             form.addEventListener('submit', async function(e) {
@@ -2915,12 +3056,12 @@
                 }
                 pwdError.classList.remove('show');
 
-                const name = document.getElementById('fName').value.trim();
-                let district = document.getElementById('fDistrict').value;
+                const name = nameInput.value.trim();
+                let district = districtSelect.value;
                 const price = document.getElementById('fPrice').value;
                 const rating = parseInt(document.getElementById('fRating').value);
                 const cuisine = document.getElementById('fCuisine').value;
-                const location = document.getElementById('fLocation').value.trim();
+                const location = locationInput.value.trim();
                 const phone = document.getElementById('fPhone').value.trim();
                 const hours = document.getElementById('fHours').value.trim();
                 const recommender = document.getElementById('fRecommender').value.trim();
@@ -2946,10 +3087,10 @@
                     district = custom;
                 } else if (!district) { alert('請選擇地區。'); return; }
 
-                if (!isValidName(name)) { alert('名稱需1~50字'); document.getElementById('fName').focus(); return; }
+                if (!isValidName(name)) { alert('名稱需1~50字'); nameInput.focus(); return; }
                 if (!['high', 'medium', 'low'].includes(price)) { alert('價格錯誤'); return; }
                 if (![1, 2, 3].includes(rating)) { alert('評分錯誤'); return; }
-                if (!isValidLocation(location)) { alert('地址錯誤'); document.getElementById('fLocation').focus(); return; }
+                if (!isValidLocation(location)) { alert('地址錯誤'); locationInput.focus(); return; }
                 if (!isValidPhone(phone)) { alert('電話格式錯誤'); document.getElementById('fPhone').focus(); return; }
                 if (!isValidUrl(image)) { alert('圖片網址錯誤'); document.getElementById('fImage').focus(); return; }
                 if (hours.length > 30) { alert('營業時間過長'); document.getElementById('fHours').focus(); return; }
@@ -3059,7 +3200,7 @@
             setupFilters();
             setupAddForm();
 
-            console.log('🍜 HW 飲食地圖已啟動 (使用 map.gov.hk API + proj4js 轉換)');
+            console.log('🍜 HW 飲食地圖已啟動 (地址搜尋支援地區過濾)');
             console.log('📌 管理密碼:', STATIC_PASSWORD);
         });
     </script>
