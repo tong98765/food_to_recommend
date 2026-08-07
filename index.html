@@ -1286,15 +1286,15 @@
                             <select id="cuisineSelectDesktop">
                                 <option value="all">全部</option>
                                 <option value="港式">港式</option>
-                                <option value="中菜">中菜</option>
+                                <option value="魯菜">魯菜</option>
+                                <option value="川菜">川菜</option>
                                 <option value="粵菜">粵菜</option>
                                 <option value="台灣菜">台灣菜</option>
+                                <option value="其他中菜">其他中菜</option>
                                 <option value="日本菜">日本菜</option>
                                 <option value="韓國菜">韓國菜</option>
                                 <option value="泰國菜">泰國菜</option>
-                                <option value="亞洲菜">亞洲菜</option>
-                                <option value="意大利菜">意大利菜</option>
-                                <option value="法國菜">法國菜</option>
+                                <option value="海鮮">海鮮</option>
                                 <option value="西餐">西餐</option>
                                 <option value="火鍋">火鍋</option>
                                 <option value="咖啡廳">咖啡廳</option>
@@ -1364,15 +1364,15 @@
                     <select id="cuisineSelectMobile">
                         <option value="all">全部</option>
                         <option value="港式">港式</option>
-                        <option value="中菜">中菜</option>
+                        <option value="魯菜">魯菜</option>
+                        <option value="川菜">川菜</option>
                         <option value="粵菜">粵菜</option>
                         <option value="台灣菜">台灣菜</option>
+                        <option value="其他中菜">其他中菜</option>
                         <option value="日本菜">日本菜</option>
                         <option value="韓國菜">韓國菜</option>
                         <option value="泰國菜">泰國菜</option>
-                        <option value="亞洲菜">亞洲菜</option>
-                        <option value="意大利菜">意大利菜</option>
-                        <option value="法國菜">法國菜</option>
+                        <option value="海鮮">海鮮</option>
                         <option value="西餐">西餐</option>
                         <option value="火鍋">火鍋</option>
                         <option value="咖啡廳">咖啡廳</option>
@@ -1452,15 +1452,15 @@
                     <select id="fCuisine" required>
                         <option value="">請選擇</option>
                         <option value="港式">港式</option>
-                        <option value="中菜">中菜</option>
+                        <option value="魯菜">魯菜</option>
+                        <option value="川菜">川菜</option>
                         <option value="粵菜">粵菜</option>
                         <option value="台灣菜">台灣菜</option>
+                        <option value="其他中菜">其他中菜</option>
                         <option value="日本菜">日本菜</option>
                         <option value="韓國菜">韓國菜</option>
                         <option value="泰國菜">泰國菜</option>
-                        <option value="亞洲菜">亞洲菜</option>
-                        <option value="意大利菜">意大利菜</option>
-                        <option value="法國菜">法國菜</option>
+                        <option value="海鮮">海鮮</option>
                         <option value="西餐">西餐</option>
                         <option value="火鍋">火鍋</option>
                         <option value="咖啡廳">咖啡廳</option>
@@ -1637,9 +1637,8 @@
             [22.56, 114.40]
         ];
 
-        const CUISINES = ['港式', '中菜', '粵菜', '台灣菜', '日本菜', '韓國菜', '泰國菜', '亞洲菜', '意大利菜', '法國菜', '西餐', '火鍋',
-            '咖啡廳'
-        ];
+        // 更新品類為指定分類
+        const CUISINES = ['港式', '魯菜', '川菜', '粵菜', '台灣菜', '其他中菜', '日本菜', '韓國菜', '泰國菜', '海鮮', '西餐', '火鍋', '咖啡廳'];
         const PERIODS = ['早餐', '中午', '下午茶', '晚餐', '宵夜'];
 
         // =============================================================
@@ -1676,7 +1675,7 @@
             district: '深水埗區',
             price: 'low',
             rating: 3,
-            cuisine: '粵菜點心',
+            cuisine: '粵菜',
             location: '深水埗福榮街9-11號地下',
             phone: '+852 2788 1226',
             hours: '10:00-21:30',
@@ -1748,7 +1747,7 @@
             district: '油尖旺區',
             price: 'low',
             rating: 3,
-            cuisine: '港式茶餐廳',
+            cuisine: '港式',
             location: '佐敦白加士街47-49號地下',
             phone: '+852 2730 1356',
             hours: '07:30-23:00',
@@ -1784,7 +1783,7 @@
             district: '中西區',
             price: 'low',
             rating: 2,
-            cuisine: '粵菜點心',
+            cuisine: '粵菜',
             location: '中環威靈頓街160-164號',
             phone: '+852 2544 4556',
             hours: '06:00-22:00',
@@ -1802,7 +1801,7 @@
             district: '南區',
             price: 'medium',
             rating: 2,
-            cuisine: '美式海鮮',
+            cuisine: '海鮮',
             location: '香港仔海傍道8號',
             phone: '+852 2552 8866',
             hours: '11:00-23:00',
