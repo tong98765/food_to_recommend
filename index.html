@@ -12,7 +12,7 @@
 
     <style>
         /* ============================================================
-           全域樣式 (此處僅保留關鍵部分，完整請參考前文)
+           全域樣式 (完整保留，僅修改相關文字)
            ============================================================ */
         * {
             margin: 0;
@@ -243,6 +243,7 @@
             color: #6C5CE7;
         }
 
+        /* 品類下拉選單 */
         .cuisine-select-wrapper {
             margin-top: 4px;
         }
@@ -262,6 +263,30 @@
             appearance: auto;
         }
         .cuisine-select-wrapper select:focus {
+            border-color: #007DFF;
+            background: #EEF4FE;
+        }
+
+        /* 推廣時段下拉 */
+        .period-select-wrapper {
+            margin-top: 4px;
+        }
+        .period-select-wrapper select {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1.5px solid #D0D7DE;
+            border-radius: 20px;
+            background: #F5F6F8;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4A5A6A;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: 0.2s;
+            appearance: auto;
+        }
+        .period-select-wrapper select:focus {
             border-color: #007DFF;
             background: #EEF4FE;
         }
@@ -361,6 +386,7 @@
             margin-top: 4px;
             font-size: 12px;
             color: #4A5A6A;
+            flex-wrap: wrap;
         }
         .restaurant-card .business-tags span {
             display: inline-flex;
@@ -372,6 +398,19 @@
         }
         .restaurant-card .business-tags .no {
             color: #D0D7DE;
+        }
+        .restaurant-card .period-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 3px;
+            flex-wrap: wrap;
+        }
+        .restaurant-card .period-tags span {
+            background: #E8ECF0;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #4A5A6A;
         }
         .restaurant-card .card-actions {
             margin-top: 6px;
@@ -538,6 +577,7 @@
             margin-top: 4px;
             font-size: 12px;
             color: #4A5A6A;
+            flex-wrap: wrap;
         }
         .leaflet-popup-content .iw-business span {
             display: inline-flex;
@@ -549,6 +589,17 @@
         }
         .leaflet-popup-content .iw-business .no {
             color: #D0D7DE;
+        }
+        .leaflet-popup-content .iw-periods {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #4A5A6A;
+        }
+        .leaflet-popup-content .iw-periods span {
+            background: #E8ECF0;
+            padding: 0 8px;
+            border-radius: 12px;
+            margin-right: 4px;
         }
         .leaflet-popup-content .price-badge {
             display: inline-block;
@@ -759,6 +810,27 @@
             accent-color: #007DFF;
             cursor: pointer;
         }
+        .modal .period-checkbox-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding-top: 4px;
+        }
+        .modal .period-checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #1A1A1A;
+            cursor: pointer;
+        }
+        .modal .period-checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #007DFF;
+            cursor: pointer;
+        }
         .modal .modal-actions {
             display: flex;
             gap: 10px;
@@ -797,12 +869,13 @@
         }
 
         /* ============================================================
-           手機版
+           手機版 (含餐廳列表折疊顯示)
            ============================================================ */
         @media (max-width: 768px) {
             .sidebar {
                 display: none !important;
             }
+
             .app-body {
                 display: flex !important;
                 flex-direction: column !important;
@@ -810,6 +883,7 @@
                 padding: 0 !important;
                 overflow: hidden !important;
             }
+
             .map-container {
                 flex: 1 !important;
                 min-height: 0 !important;
@@ -817,6 +891,125 @@
                 position: relative !important;
                 transition: flex 0.4s ease, max-height 0.4s ease;
             }
+
+            .mobile-restaurant-list {
+                display: none !important;
+                flex: 1 !important;
+                overflow-y: auto !important;
+                background: #FAFBFC !important;
+                padding: 8px 12px 12px !important;
+                min-height: 0 !important;
+            }
+            .mobile-restaurant-list .restaurant-card {
+                background: #FFFFFF;
+                border-radius: 12px;
+                padding: 10px 14px;
+                margin-bottom: 6px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                border: 1px solid #F1F3F5;
+                cursor: pointer;
+                transition: all 0.2s;
+                position: relative;
+            }
+            .mobile-restaurant-list .restaurant-card:hover {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                transform: translateY(-1px);
+            }
+            .mobile-restaurant-list .restaurant-card .name {
+                font-size: 14px;
+                font-weight: 600;
+                color: #1A1A1A;
+                letter-spacing: -0.2px;
+            }
+            .mobile-restaurant-list .restaurant-card .meta {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 3px;
+                font-size: 12px;
+                color: #6B7A8A;
+                flex-wrap: wrap;
+            }
+            .mobile-restaurant-list .restaurant-card .price-badge {
+                display: inline-block;
+                padding: 1px 8px;
+                border-radius: 20px;
+                font-size: 10px;
+                font-weight: 600;
+            }
+            .mobile-restaurant-list .restaurant-card .stars {
+                color: #FFB800;
+                font-size: 12px;
+                letter-spacing: 0.5px;
+            }
+            .mobile-restaurant-list .restaurant-card .district-label {
+                font-size: 10px;
+                color: #8A9AA8;
+                background: #F0F2F5;
+                padding: 1px 8px;
+                border-radius: 12px;
+            }
+            .mobile-restaurant-list .restaurant-card .cuisine-type {
+                font-size: 10px;
+                color: #8A9AA8;
+                background: #F0F2F5;
+                padding: 1px 8px;
+                border-radius: 12px;
+            }
+            .mobile-restaurant-list .restaurant-card .business-tags {
+                display: flex;
+                gap: 10px;
+                margin-top: 4px;
+                font-size: 12px;
+                color: #4A5A6A;
+                flex-wrap: wrap;
+            }
+            .mobile-restaurant-list .restaurant-card .business-tags span {
+                display: inline-flex;
+                align-items: center;
+                gap: 3px;
+            }
+            .mobile-restaurant-list .restaurant-card .business-tags .yes {
+                color: #2ED573;
+            }
+            .mobile-restaurant-list .restaurant-card .business-tags .no {
+                color: #D0D7DE;
+            }
+            .mobile-restaurant-list .restaurant-card .period-tags {
+                display: flex;
+                gap: 6px;
+                margin-top: 3px;
+                flex-wrap: wrap;
+            }
+            .mobile-restaurant-list .restaurant-card .period-tags span {
+                background: #E8ECF0;
+                padding: 0 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                color: #4A5A6A;
+            }
+            .mobile-restaurant-list .restaurant-card .comment-preview {
+                font-size: 12px;
+                color: #6B7A8A;
+                margin-top: 3px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .mobile-restaurant-list .restaurant-card .recommender {
+                font-size: 11px;
+                color: #8A9AA8;
+                margin-top: 2px;
+            }
+            .mobile-restaurant-list .restaurant-card .card-actions {
+                margin-top: 6px;
+                display: flex;
+                justify-content: flex-end;
+                gap: 6px;
+                border-top: 1px solid #F1F3F5;
+                padding-top: 6px;
+            }
+
             .app-body.map-collapsed .map-container {
                 flex: 0 0 0 !important;
                 max-height: 0 !important;
@@ -824,21 +1017,27 @@
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            .app-body.map-collapsed .mobile-filter-bar {
+            .app-body.map-collapsed .mobile-restaurant-list {
+                display: block !important;
                 flex: 1 !important;
-                height: auto !important;
-                max-height: 100% !important;
             }
+            .app-body.map-collapsed .mobile-filter-bar {
+                flex: 0 0 50dvh !important;
+                height: 50dvh !important;
+                max-height: 50dvh !important;
+            }
+
             #map {
                 height: 100% !important;
                 width: 100% !important;
             }
+
             .mobile-filter-bar {
                 display: flex !important;
                 flex-direction: column !important;
                 flex-shrink: 0 !important;
                 height: 50dvh !important;
-                max-height: none !important;
+                max-height: 50dvh !important;
                 overflow-y: auto !important;
                 background: #FFFFFF !important;
                 border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
@@ -851,6 +1050,7 @@
                 right: auto !important;
                 transition: flex 0.4s ease, height 0.4s ease;
             }
+
             .mobile-filter-bar .filter-label {
                 font-size: 12px;
                 font-weight: 600;
@@ -872,14 +1072,16 @@
                 grid-template-columns: repeat(4, 1fr);
             }
             .mobile-filter-bar .filter-row.business-row {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
-            .mobile-filter-bar .cuisine-select-wrapper {
+            .mobile-filter-bar .cuisine-select-wrapper,
+            .mobile-filter-bar .period-select-wrapper {
                 margin-top: 0;
                 padding-bottom: 4px;
                 flex-shrink: 0;
             }
-            .mobile-filter-bar .cuisine-select-wrapper select {
+            .mobile-filter-bar .cuisine-select-wrapper select,
+            .mobile-filter-bar .period-select-wrapper select {
                 padding: 6px 10px;
                 font-size: 13px;
                 border-radius: 16px;
@@ -895,6 +1097,7 @@
                 border-color: #6C5CE7;
                 color: #6C5CE7;
             }
+
             .toggle-map-btn {
                 position: absolute !important;
                 top: 12px !important;
@@ -903,6 +1106,7 @@
                 height: 36px !important;
                 font-size: 16px !important;
             }
+
             .locate-btn {
                 bottom: 20px !important;
                 right: 16px !important;
@@ -918,6 +1122,7 @@
                 padding: 6px 16px !important;
                 z-index: 500 !important;
             }
+
             .modal-overlay {
                 position: fixed !important;
                 top: 0 !important;
@@ -984,6 +1189,9 @@
             .modal .business-checkbox-group {
                 gap: 12px;
             }
+            .modal .period-checkbox-group {
+                gap: 10px;
+            }
             .modal .modal-actions {
                 margin-top: 16px;
                 padding-top: 12px;
@@ -1001,6 +1209,9 @@
 
         @media (min-width: 769px) {
             .mobile-filter-bar {
+                display: none !important;
+            }
+            .mobile-restaurant-list {
                 display: none !important;
             }
             .app-body {
@@ -1044,7 +1255,7 @@
         <div class="app-body" id="appBody">
             <button class="toggle-map-btn" id="toggleMapBtn" title="折疊/展開地圖">▲</button>
 
-            <!-- 側邊欄 -->
+            <!-- 側邊欄 (桌面) -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-scroll">
                     <div class="sidebar-section">
@@ -1052,7 +1263,7 @@
                         <div class="district-grid" id="districtGrid"></div>
                     </div>
                     <div class="sidebar-section">
-                        <h3>💰 價格</h3>
+                        <h3>💰 人均價格</h3>
                         <div class="filter-group" id="priceFilter">
                             <span class="filter-tag active" data-price="all">全部</span>
                             <span class="filter-tag high" data-price="high">高 &gt;$800</span>
@@ -1061,7 +1272,7 @@
                         </div>
                     </div>
                     <div class="sidebar-section">
-                        <h3>⭐ 星級</h3>
+                        <h3>⭐ 味道評價</h3>
                         <div class="filter-group" id="starFilter">
                             <span class="filter-tag star active" data-stars="all">全部</span>
                             <span class="filter-tag star" data-stars="1">★ 1星</span>
@@ -1086,15 +1297,30 @@
                                 <option value="法國菜">法國菜</option>
                                 <option value="西餐">西餐</option>
                                 <option value="火鍋">火鍋</option>
+                                <option value="咖啡廳">咖啡廳</option>
                             </select>
                         </div>
                     </div>
                     <div class="sidebar-section">
                         <h3>💼 適合談生意</h3>
                         <div class="filter-group" id="businessFilter">
-                            <span class="filter-tag business" data-business="capacity">👥 人數足夠</span>
                             <span class="filter-tag business" data-business="environment">🏢 環境體面</span>
-                            <span class="filter-tag business" data-business="noise">🔇 隔音良好</span>
+                            <span class="filter-tag business" data-business="noise">🔇 環境寧靜</span>
+                            <span class="filter-tag business" data-business="few_people">👥 人數少</span>
+                            <span class="filter-tag business" data-business="private_room">🚪 有包間</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>📅 推廣時段</h3>
+                        <div class="period-select-wrapper">
+                            <select id="periodSelectDesktop">
+                                <option value="all">全部</option>
+                                <option value="早餐">早餐</option>
+                                <option value="中午">中午</option>
+                                <option value="下午茶">下午茶</option>
+                                <option value="晚餐">晚餐</option>
+                                <option value="宵夜">宵夜</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -1110,18 +1336,23 @@
                 <button class="locate-btn" id="locateBtn" title="定位到我">📍</button>
             </div>
 
+            <!-- 手機版餐廳列表 (折疊時顯示) -->
+            <div class="mobile-restaurant-list" id="mobileRestaurantList">
+                <!-- 由 JS 動態填充 -->
+            </div>
+
             <!-- 手機版 Filter -->
             <div class="mobile-filter-bar" id="mobileFilterBar">
                 <div class="filter-label">🏙️ 地區</div>
                 <div class="filter-row district-row" id="mobileDistrictFilter"></div>
-                <div class="filter-label">💰 價格</div>
+                <div class="filter-label">💰 人均價格</div>
                 <div class="filter-row price-row" id="mobilePriceFilter">
                     <span class="filter-tag active" data-price="all">全部</span>
                     <span class="filter-tag high" data-price="high">高</span>
                     <span class="filter-tag medium" data-price="medium">中</span>
                     <span class="filter-tag low" data-price="low">低</span>
                 </div>
-                <div class="filter-label">⭐ 星級</div>
+                <div class="filter-label">⭐ 味道評價</div>
                 <div class="filter-row star-row" id="mobileStarFilter">
                     <span class="filter-tag star active" data-stars="all">全部</span>
                     <span class="filter-tag star" data-stars="1">★1</span>
@@ -1144,19 +1375,32 @@
                         <option value="法國菜">法國菜</option>
                         <option value="西餐">西餐</option>
                         <option value="火鍋">火鍋</option>
+                        <option value="咖啡廳">咖啡廳</option>
                     </select>
                 </div>
                 <div class="filter-label">💼 適合談生意</div>
                 <div class="filter-row business-row" id="mobileBusinessFilter">
-                    <span class="filter-tag business" data-business="capacity">👥 人數</span>
-                    <span class="filter-tag business" data-business="environment">🏢 環境</span>
-                    <span class="filter-tag business" data-business="noise">🔇 隔音</span>
+                    <span class="filter-tag business" data-business="environment">🏢 環境體面</span>
+                    <span class="filter-tag business" data-business="noise">🔇 環境寧靜</span>
+                    <span class="filter-tag business" data-business="few_people">👥 人數少</span>
+                    <span class="filter-tag business" data-business="private_room">🚪 有包間</span>
+                </div>
+                <div class="filter-label">📅 推廣時段</div>
+                <div class="period-select-wrapper">
+                    <select id="periodSelectMobile">
+                        <option value="all">全部</option>
+                        <option value="早餐">早餐</option>
+                        <option value="中午">中午</option>
+                        <option value="下午茶">下午茶</option>
+                        <option value="晚餐">晚餐</option>
+                        <option value="宵夜">宵夜</option>
+                    </select>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== 新增餐廳模態框 (已移除「定位」按鈕) ===== -->
+    <!-- ===== 新增餐廳模態框 ===== -->
     <div class="modal-overlay" id="addModal">
         <div class="modal">
             <div class="modal-close-top">
@@ -1187,7 +1431,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>價格等級 *</label>
+                        <label>人均價格 *</label>
                         <select id="fPrice" required>
                             <option value="high">高 (>$800)</option>
                             <option value="medium">中 (>$300)</option>
@@ -1195,7 +1439,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>評分 (1-3星)</label>
+                        <label>味道評價 (1-3星)</label>
                         <select id="fRating">
                             <option value="3">★★★ (3)</option>
                             <option value="2" selected>★★☆ (2)</option>
@@ -1219,15 +1463,14 @@
                         <option value="法國菜">法國菜</option>
                         <option value="西餐">西餐</option>
                         <option value="火鍋">火鍋</option>
+                        <option value="咖啡廳">咖啡廳</option>
                     </select>
                 </div>
-                <!-- 地址輸入 (無定位按鈕) -->
                 <div class="form-group">
                     <label>地址 / 位置 *</label>
                     <input type="text" id="fLocation" placeholder="灣仔港灣道1號君悅酒店大堂" required />
                     <div class="geocode-status" id="geocodeStatus">💡 提交時會自動嘗試定位地址</div>
                 </div>
-                <!-- 經緯度輸入框 (可手動修正) -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>緯度 (Latitude)</label>
@@ -1258,12 +1501,25 @@
                     <label>評論 / 備註</label>
                     <textarea id="fComment" placeholder="分享你的用餐體驗..."></textarea>
                 </div>
+                <!-- 適合談生意 (四項) -->
                 <div class="form-group">
                     <label>適合談生意</label>
                     <div class="business-checkbox-group">
-                        <label><input type="checkbox" id="fBusinessCapacity" /> 👥 人數足夠</label>
                         <label><input type="checkbox" id="fBusinessEnvironment" /> 🏢 環境體面</label>
-                        <label><input type="checkbox" id="fBusinessNoise" /> 🔇 隔音良好</label>
+                        <label><input type="checkbox" id="fBusinessNoise" /> 🔇 環境寧靜</label>
+                        <label><input type="checkbox" id="fBusinessFewPeople" /> 👥 人數少</label>
+                        <label><input type="checkbox" id="fBusinessPrivateRoom" /> 🚪 有包間</label>
+                    </div>
+                </div>
+                <!-- 推廣時段 (多選) -->
+                <div class="form-group">
+                    <label>推廣時段 (選填，可多選)</label>
+                    <div class="period-checkbox-group">
+                        <label><input type="checkbox" class="period-check" value="早餐" /> 早餐</label>
+                        <label><input type="checkbox" class="period-check" value="中午" /> 中午</label>
+                        <label><input type="checkbox" class="period-check" value="下午茶" /> 下午茶</label>
+                        <label><input type="checkbox" class="period-check" value="晚餐" /> 晚餐</label>
+                        <label><input type="checkbox" class="period-check" value="宵夜" /> 宵夜</label>
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -1276,7 +1532,7 @@
 
 
     <!-- ============================================================
-    JavaScript (ES Module) - 自動解析地址
+    JavaScript (ES Module) - 完整功能
     ============================================================ -->
     <script type="module">
         // =============================================================
@@ -1381,10 +1637,13 @@
             [22.56, 114.40]
         ];
 
-        const CUISINES = ['港式', '中菜', '粵菜', '台灣菜', '日本菜', '韓國菜', '泰國菜', '亞洲菜', '意大利菜', '法國菜', '西餐', '火鍋'];
+        const CUISINES = ['港式', '中菜', '粵菜', '台灣菜', '日本菜', '韓國菜', '泰國菜', '亞洲菜', '意大利菜', '法國菜', '西餐', '火鍋',
+            '咖啡廳'
+        ];
+        const PERIODS = ['早餐', '中午', '下午茶', '晚餐', '宵夜'];
 
         // =============================================================
-        // 5. 預設範例資料 (含 business 參數)
+        // 5. 預設範例資料 (更新 business 及新增 periods)
         // =============================================================
 
         function convertRating(oldRating) {
@@ -1409,7 +1668,8 @@
             lat: 22.2871,
             lng: 114.1586,
             comments: [{ text: '非常棒的體驗！', timestamp: '2026-08-01 14:30', recommender: '陳先生' }],
-            business: { capacity: true, environment: true, noise: true }
+            business: { environment: true, noise: true, few_people: false, private_room: true },
+            promotionPeriods: ['午餐', '晚餐']
         }, {
             id: 'r2',
             name: '添好運 (深水埗)',
@@ -1426,7 +1686,8 @@
             lat: 22.3312,
             lng: 114.1628,
             comments: [{ text: '每次去都要排隊！', timestamp: '2026-07-30 12:20', recommender: '張太' }],
-            business: { capacity: false, environment: false, noise: false }
+            business: { environment: false, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['午餐', '下午茶']
         }, {
             id: 'r3',
             name: '一樂燒鵝',
@@ -1443,7 +1704,8 @@
             lat: 22.2829,
             lng: 114.1579,
             comments: [],
-            business: { capacity: false, environment: false, noise: false }
+            business: { environment: false, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['午餐', '晚餐']
         }, {
             id: 'r4',
             name: '甘牌燒鵝',
@@ -1460,7 +1722,8 @@
             lat: 22.2783,
             lng: 114.1779,
             comments: [],
-            business: { capacity: false, environment: false, noise: false }
+            business: { environment: false, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['午餐', '晚餐']
         }, {
             id: 'r5',
             name: '九記牛腩',
@@ -1477,7 +1740,8 @@
             lat: 22.2853,
             lng: 114.1547,
             comments: [],
-            business: { capacity: false, environment: false, noise: false }
+            business: { environment: false, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['午餐', '晚餐', '宵夜']
         }, {
             id: 'r6',
             name: '澳洲牛奶公司',
@@ -1494,7 +1758,8 @@
             lat: 22.3054,
             lng: 114.1714,
             comments: [],
-            business: { capacity: false, environment: false, noise: false }
+            business: { environment: false, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['早餐', '午餐']
         }, {
             id: 'r7',
             name: '鏞記酒家',
@@ -1511,7 +1776,8 @@
             lat: 22.2837,
             lng: 114.1570,
             comments: [],
-            business: { capacity: true, environment: true, noise: false }
+            business: { environment: true, noise: false, few_people: false, private_room: true },
+            promotionPeriods: ['午餐', '晚餐']
         }, {
             id: 'r8',
             name: '蓮香樓',
@@ -1528,7 +1794,8 @@
             lat: 22.2844,
             lng: 114.1543,
             comments: [],
-            business: { capacity: false, environment: false, noise: false }
+            business: { environment: false, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['早餐', '午餐', '下午茶']
         }, {
             id: 'r9',
             name: '阿甘蝦餐廳',
@@ -1545,7 +1812,8 @@
             lat: 22.2483,
             lng: 114.1535,
             comments: [],
-            business: { capacity: true, environment: true, noise: false }
+            business: { environment: true, noise: false, few_people: false, private_room: false },
+            promotionPeriods: ['午餐', '晚餐']
         }, {
             id: 'r10',
             name: '大班樓',
@@ -1562,7 +1830,8 @@
             lat: 22.2847,
             lng: 114.1554,
             comments: [],
-            business: { capacity: true, environment: true, noise: true }
+            business: { environment: true, noise: true, few_people: false, private_room: true },
+            promotionPeriods: ['午餐', '晚餐']
         }];
 
         // =============================================================
@@ -1583,8 +1852,10 @@
                     if (raw.rating > 3) raw.rating = convertRating(raw.rating);
                     if (!raw.hasOwnProperty('recommender')) raw.recommender = '';
                     if (!raw.hasOwnProperty('comments') || !Array.isArray(raw.comments)) raw.comments = [];
-                    if (!raw.hasOwnProperty('business')) raw.business = { capacity: false, environment: false,
-                        noise: false };
+                    if (!raw.hasOwnProperty('business')) raw.business = { environment: false, noise: false,
+                        few_people: false, private_room: false };
+                    if (!raw.hasOwnProperty('promotionPeriods') || !Array.isArray(raw.promotionPeriods)) raw
+                        .promotionPeriods = [];
                     data.push(raw);
                 });
                 localStorage.setItem('hk_restaurants', JSON.stringify(data));
@@ -1644,12 +1915,14 @@
         let map = null;
         let markersLayer = null;
         let userMarker = null;
-        let geocodeMarker = null; // 地址搜尋臨時標記
+        let geocodeMarker = null;
         let activeDistrict = null;
         let activePrice = 'all';
         let activeStars = 'all';
         let activeCuisine = 'all';
-        let filterBusiness = { capacity: false, environment: false, noise: false };
+        // 適合談生意過濾 (四個獨立布林)
+        let filterBusiness = { environment: false, noise: false, few_people: false, private_room: false };
+        let activePeriod = 'all'; // 推廣時段
 
         let currentPopupRestaurantId = null;
         let focusCommentOnOpen = false;
@@ -1684,11 +1957,12 @@
             setupLocateEvents();
             setupCuisineFilters();
             setupBusinessFilters();
+            setupPeriodFilters();
             document.getElementById('toggleMapBtn').addEventListener('click', toggleMap);
         }
 
         // =============================================================
-        // 9. GPS 定位
+        // 9. GPS 定位 (同前)
         // =============================================================
 
         const locateStatus = document.getElementById('locateStatus');
@@ -1756,7 +2030,7 @@
         }
 
         // =============================================================
-        // 11. 構建彈窗內容 (含 Business 參數)
+        // 11. 構建彈窗內容 (更新 business 顯示)
         // =============================================================
 
         function buildInfoWindowContent(r) {
@@ -1764,14 +2038,21 @@
             const priceLabel = PRICE_LABELS[r.price] || r.price;
             const priceClass = r.price;
 
-            const biz = r.business || { capacity: false, environment: false, noise: false };
+            const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
             const bizHtml = `
                 <div class="iw-business">
-                    <span class="${biz.capacity ? 'yes' : 'no'}">${biz.capacity ? '✅' : '❌'} 人數足夠</span>
                     <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
-                    <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音良好</span>
+                    <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 環境寧靜</span>
+                    <span class="${biz.few_people ? 'yes' : 'no'}">${biz.few_people ? '✅' : '❌'} 人數少</span>
+                    <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 有包間</span>
                 </div>
             `;
+
+            let periodsHtml = '';
+            if (r.promotionPeriods && r.promotionPeriods.length > 0) {
+                const periodTags = r.promotionPeriods.map(p => `<span>${escapeHtml(p)}</span>`).join('');
+                periodsHtml = `<div class="iw-periods">📅 推廣時段：${periodTags}</div>`;
+            }
 
             let html = `
                 <div class="info-window" data-restaurant-id="${r.id}">
@@ -1800,6 +2081,7 @@
             }
 
             html += bizHtml;
+            html += periodsHtml;
 
             html += `<div class="iw-comments">`;
             html += `<div style="font-weight:600;font-size:14px;margin-bottom:6px;">💬 評論 (${r.comments ? r.comments.length : 0})</div>`;
@@ -1829,7 +2111,7 @@
             return html;
         }
 
-        // 評論提交事件
+        // 評論提交事件 (同前)
         function bindCommentForm(popupContainer, restaurantId) {
             const form = popupContainer.querySelector('.iw-comment-form');
             if (!form) return;
@@ -1922,6 +2204,8 @@
             if (filtered.length === 0) {
                 document.getElementById('restaurantList').innerHTML =
                     '<div class="text-muted" style="text-align:center;padding:20px 0;">沒有符合條件的餐廳</div>';
+                document.getElementById('mobileRestaurantList').innerHTML =
+                    '<div class="text-muted" style="text-align:center;padding:20px 0;">沒有符合條件的餐廳</div>';
                 return;
             }
             const currentId = currentPopupRestaurantId;
@@ -1956,6 +2240,7 @@
                 markersLayer.addLayer(marker);
             });
             renderList(filtered);
+            renderMobileList(filtered);
             if (filtered.length === 1) {
                 map.setView([filtered[0].lat, filtered[0].lng], 15);
             } else if (filtered.length > 0) {
@@ -1971,7 +2256,7 @@
         }
 
         // =============================================================
-        // 13. 過濾邏輯 (含適合談生意)
+        // 13. 過濾邏輯 (含 business 四項 + 時段)
         // =============================================================
 
         function getFilteredRestaurants() {
@@ -1985,17 +2270,22 @@
                 if (activeStars !== 'all' && r.rating !== parseInt(activeStars)) return false;
                 if (activeCuisine !== 'all' && r.cuisine !== activeCuisine) return false;
 
-                const biz = r.business || { capacity: false, environment: false, noise: false };
-                if (filterBusiness.capacity && !biz.capacity) return false;
+                const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
                 if (filterBusiness.environment && !biz.environment) return false;
                 if (filterBusiness.noise && !biz.noise) return false;
+                if (filterBusiness.few_people && !biz.few_people) return false;
+                if (filterBusiness.private_room && !biz.private_room) return false;
+
+                if (activePeriod !== 'all') {
+                    if (!r.promotionPeriods || !r.promotionPeriods.includes(activePeriod)) return false;
+                }
 
                 return true;
             });
         }
 
         // =============================================================
-        // 14. 側邊欄列表
+        // 14. 側邊欄列表 (桌面)
         // =============================================================
 
         function renderList(filtered) {
@@ -2010,13 +2300,18 @@
                 const stars = '★'.repeat(r.rating) + '☆'.repeat(3 - r.rating);
                 const priceClass = r.price;
                 const priceLabel = PRICE_LABELS[r.price] || r.price;
-                const biz = r.business || { capacity: false, environment: false, noise: false };
+                const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
                 const bizTags =
                     `<div class="business-tags">
-                        <span class="${biz.capacity ? 'yes' : 'no'}">${biz.capacity ? '✅' : '❌'} 人數</span>
-                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境</span>
-                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音</span>
+                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
+                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 環境寧靜</span>
+                        <span class="${biz.few_people ? 'yes' : 'no'}">${biz.few_people ? '✅' : '❌'} 人數少</span>
+                        <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 有包間</span>
                     </div>`;
+                let periodTags = '';
+                if (r.promotionPeriods && r.promotionPeriods.length > 0) {
+                    periodTags = `<div class="period-tags">${r.promotionPeriods.map(p => `<span>${escapeHtml(p)}</span>`).join('')}</div>`;
+                }
                 html += `
                     <div class="restaurant-card" data-id="${r.id}">
                         <div class="name">${escapeHtml(r.name)}</div>
@@ -2027,6 +2322,7 @@
                             ${r.cuisine ? `<span class="cuisine-type">${escapeHtml(r.cuisine)}</span>` : ''}
                         </div>
                         ${bizTags}
+                        ${periodTags}
                         ${r.comment ? `<div class="comment-preview">💬 ${escapeHtml(r.comment)}</div>` : ''}
                         <div style="font-size:11px;color:#8A9AA8;margin-top:2px;">📍 ${escapeHtml(r.location || '地址待補')}</div>
                         ${r.recommender ? `<div class="recommender">👤 推薦者：${escapeHtml(r.recommender)}</div>` : ''}
@@ -2056,7 +2352,74 @@
         }
 
         // =============================================================
-        // 15. 地區按鈕
+        // 15. 手機版列表 (與桌面同步)
+        // =============================================================
+
+        function renderMobileList(filtered) {
+            const container = document.getElementById('mobileRestaurantList');
+            if (!filtered || filtered.length === 0) {
+                container.innerHTML =
+                    '<div class="text-muted" style="text-align:center;padding:20px 0;">沒有符合條件的餐廳 🍽️</div>';
+                return;
+            }
+            let html = '';
+            filtered.forEach(r => {
+                const stars = '★'.repeat(r.rating) + '☆'.repeat(3 - r.rating);
+                const priceClass = r.price;
+                const priceLabel = PRICE_LABELS[r.price] || r.price;
+                const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
+                const bizTags =
+                    `<div class="business-tags">
+                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
+                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 環境寧靜</span>
+                        <span class="${biz.few_people ? 'yes' : 'no'}">${biz.few_people ? '✅' : '❌'} 人數少</span>
+                        <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 有包間</span>
+                    </div>`;
+                let periodTags = '';
+                if (r.promotionPeriods && r.promotionPeriods.length > 0) {
+                    periodTags = `<div class="period-tags">${r.promotionPeriods.map(p => `<span>${escapeHtml(p)}</span>`).join('')}</div>`;
+                }
+                html += `
+                    <div class="restaurant-card" data-id="${r.id}">
+                        <div class="name">${escapeHtml(r.name)}</div>
+                        <div class="meta">
+                            <span class="stars">${stars}</span>
+                            <span class="price-badge ${priceClass}">${escapeHtml(priceLabel)}</span>
+                            <span class="district-label">${escapeHtml(r.district)}</span>
+                            ${r.cuisine ? `<span class="cuisine-type">${escapeHtml(r.cuisine)}</span>` : ''}
+                        </div>
+                        ${bizTags}
+                        ${periodTags}
+                        ${r.comment ? `<div class="comment-preview">💬 ${escapeHtml(r.comment)}</div>` : ''}
+                        <div style="font-size:11px;color:#8A9AA8;margin-top:2px;">📍 ${escapeHtml(r.location || '地址待補')}</div>
+                        ${r.recommender ? `<div class="recommender">👤 推薦者：${escapeHtml(r.recommender)}</div>` : ''}
+                        <div style="font-size:11px;color:#8A9AA8;margin-top:2px;">💬 ${r.comments ? r.comments.length : 0} 則評論</div>
+                        <div class="card-actions">
+                            <button class="btn-edit" data-id="${r.id}">✏️ 編輯評論</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            container.querySelectorAll('.restaurant-card').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('btn-edit')) return;
+                    const id = this.dataset.id;
+                    openPopupForRestaurant(id, false);
+                });
+                const editBtn = el.querySelector('.btn-edit');
+                if (editBtn) {
+                    editBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = this.dataset.id;
+                        openPopupForRestaurant(id, true);
+                    });
+                }
+            });
+        }
+
+        // =============================================================
+        // 16. 地區按鈕
         // =============================================================
 
         function renderDistrictButtons() {
@@ -2118,7 +2481,7 @@
         }
 
         // =============================================================
-        // 16. 價格與星級篩選
+        // 17. 價格與星級篩選
         // =============================================================
 
         function setupFilters() {
@@ -2181,7 +2544,7 @@
         }
 
         // =============================================================
-        // 17. 品類下拉選單的監聽 (含火鍋)
+        // 18. 品類下拉選單的監聽 (含咖啡廳)
         // =============================================================
 
         function setupCuisineFilters() {
@@ -2203,7 +2566,7 @@
         }
 
         // =============================================================
-        // 18. 適合談生意篩選按鈕
+        // 19. 適合談生意篩選按鈕 (四個)
         // =============================================================
 
         function setupBusinessFilters() {
@@ -2235,7 +2598,29 @@
         }
 
         // =============================================================
-        // 19. 地圖折疊/展開功能
+        // 20. 推廣時段篩選 (下拉)
+        // =============================================================
+
+        function setupPeriodFilters() {
+            const desktopSelect = document.getElementById('periodSelectDesktop');
+            const mobileSelect = document.getElementById('periodSelectMobile');
+
+            function handlePeriodChange(value) {
+                activePeriod = value;
+                desktopSelect.value = value;
+                mobileSelect.value = value;
+                renderMarkers();
+            }
+            desktopSelect.addEventListener('change', function() {
+                handlePeriodChange(this.value);
+            });
+            mobileSelect.addEventListener('change', function() {
+                handlePeriodChange(this.value);
+            });
+        }
+
+        // =============================================================
+        // 21. 地圖折疊/展開功能 (手機顯示列表)
         // =============================================================
 
         function toggleMap() {
@@ -2245,6 +2630,10 @@
             if (appBody.classList.contains('map-collapsed')) {
                 btn.innerHTML = '▼';
                 btn.title = '展開地圖';
+                if (window.innerWidth <= 768) {
+                    const filtered = getFilteredRestaurants();
+                    renderMobileList(filtered);
+                }
             } else {
                 btn.innerHTML = '▲';
                 btn.title = '折疊地圖';
@@ -2257,7 +2646,7 @@
         }
 
         // =============================================================
-        // 20. 地址定位功能 (使用香港政府 API + CORS 代理)
+        // 22. 地址定位功能 (與前相同)
         // =============================================================
 
         async function searchAddressAndGetCoordinates(address, targetDistrict) {
@@ -2330,7 +2719,7 @@
         }
 
         // =============================================================
-        // 21. 新增餐廳 (含自動地址解析)
+        // 23. 新增餐廳 (含自動地址解析 + 新的 business + periods)
         // =============================================================
 
         function setupAddForm() {
@@ -2348,11 +2737,15 @@
             const latInput = document.getElementById('fLat');
             const lngInput = document.getElementById('fLng');
 
-            const capacityCheck = document.getElementById('fBusinessCapacity');
-            const environmentCheck = document.getElementById('fBusinessEnvironment');
+            // 適合談生意 checkboxes
+            const envCheck = document.getElementById('fBusinessEnvironment');
             const noiseCheck = document.getElementById('fBusinessNoise');
+            const fewPeopleCheck = document.getElementById('fBusinessFewPeople');
+            const privateRoomCheck = document.getElementById('fBusinessPrivateRoom');
 
-            // 地區選項
+            // 推廣時段 checkboxes
+            const periodChecks = document.querySelectorAll('.period-check');
+
             const optOther = document.createElement('option');
             optOther.value = 'other';
             optOther.textContent = '其他 (自訂)';
@@ -2373,16 +2766,18 @@
                 }
             });
 
-            // ---------- 關閉 modal ----------
             function closeModal() {
                 modal.classList.remove('open');
                 form.reset();
                 pwdError.classList.remove('show');
                 pwdInput.value = '';
                 customDistrictGroup.style.display = 'none';
-                capacityCheck.checked = false;
-                environmentCheck.checked = false;
+                // reset checkboxes
+                envCheck.checked = false;
                 noiseCheck.checked = false;
+                fewPeopleCheck.checked = false;
+                privateRoomCheck.checked = false;
+                periodChecks.forEach(cb => cb.checked = false);
                 if (geocodeMarker) {
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
@@ -2395,7 +2790,6 @@
                 lngInput.value = '';
             }
 
-            // ---------- 開啟 modal ----------
             openBtn.addEventListener('click', () => {
                 modal.classList.add('open');
                 if (activeDistrict && activeDistrict !== 'other') {
@@ -2407,9 +2801,11 @@
                 document.getElementById('fName').focus();
                 pwdInput.value = '';
                 pwdError.classList.remove('show');
-                capacityCheck.checked = false;
-                environmentCheck.checked = false;
+                envCheck.checked = false;
                 noiseCheck.checked = false;
+                fewPeopleCheck.checked = false;
+                privateRoomCheck.checked = false;
+                periodChecks.forEach(cb => cb.checked = false);
                 if (geocodeMarker) {
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
@@ -2426,7 +2822,6 @@
                 if (e.target === modal) closeModal();
             });
 
-            // ---------- 表單提交 (含自動定位) ----------
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -2451,11 +2846,19 @@
                 const image = document.getElementById('fImage').value.trim();
                 const comment = document.getElementById('fComment').value.trim();
 
+                // 收集 business 選項
                 const business = {
-                    capacity: capacityCheck.checked,
-                    environment: environmentCheck.checked,
-                    noise: noiseCheck.checked
+                    environment: envCheck.checked,
+                    noise: noiseCheck.checked,
+                    few_people: fewPeopleCheck.checked,
+                    private_room: privateRoomCheck.checked
                 };
+
+                // 收集推廣時段
+                const promotionPeriods = [];
+                periodChecks.forEach(cb => {
+                    if (cb.checked) promotionPeriods.push(cb.value);
+                });
 
                 if (!cuisine) { alert('請選擇品類'); document.getElementById('fCuisine').focus(); return; }
                 if (district === 'other') {
@@ -2474,10 +2877,8 @@
                 if (recommender.length > 30) { alert('推薦者過長'); document.getElementById('fRecommender').focus(); return; }
                 if (comment.length > 500) { alert('評論過長'); document.getElementById('fComment').focus(); return; }
 
-                // ---------- 自動地址解析 ----------
                 let lat = parseFloat(latInput.value);
                 let lng = parseFloat(lngInput.value);
-                // 如果用戶未手動輸入經緯度，則嘗試自動定位
                 if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
                     geocodeStatus.textContent = '⏳ 正在定位地址...';
                     geocodeStatus.className = 'geocode-status loading';
@@ -2485,7 +2886,6 @@
                     if (result.error) {
                         geocodeStatus.textContent = '⚠️ 自動定位失敗，使用地區中心點';
                         geocodeStatus.className = 'geocode-status error';
-                        // 使用地區中心點 (fallback)
                         const baseCoords = {
                             '中西區': { lat: 22.285, lng: 114.155 },
                             '灣仔區': { lat: 22.278, lng: 114.178 },
@@ -2515,7 +2915,6 @@
                         geocodeStatus.textContent =
                             `✅ 定位成功：${result.name} (${result.district || ''})`;
                         geocodeStatus.className = 'geocode-status success';
-                        // 可選：在地圖上顯示臨時標記
                         if (geocodeMarker) map.removeLayer(geocodeMarker);
                         const icon = L.divIcon({
                             html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
@@ -2534,7 +2933,6 @@
                     geocodeStatus.className = 'geocode-status success';
                 }
 
-                // 確保 lat/lng 有效
                 if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
                     const baseCoords = {
                         '中西區': { lat: 22.285, lng: 114.155 },
@@ -2561,7 +2959,6 @@
                     lng = base.lng + (Math.random() - 0.5) * 0.008;
                 }
 
-                // 建立新餐廳物件
                 const newRestaurant = {
                     id: 'r' + Date.now(),
                     name,
@@ -2578,7 +2975,8 @@
                     lat,
                     lng,
                     comments: [],
-                    business: business
+                    business: business,
+                    promotionPeriods: promotionPeriods
                 };
 
                 restaurants.push(newRestaurant);
@@ -2626,7 +3024,7 @@
         }
 
         // =============================================================
-        // 22. 啟動
+        // 24. 啟動
         // =============================================================
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -2635,7 +3033,7 @@
             setupFilters();
             setupAddForm();
 
-            console.log('🍜 HW 飲食地圖已啟動 (自動地址定位)');
+            console.log('🍜 HW 飲食地圖已啟動 (更新生意項目、時段、文字)');
             console.log('📌 管理密碼:', STATIC_PASSWORD);
         });
     </script>
