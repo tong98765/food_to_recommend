@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
 
-    <!-- ===== proj4js 座標轉換函式庫 ===== -->
+    <!-- ===== proj4js 座標轉換 ===== -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js">
     </script>
 
@@ -255,6 +255,8 @@
             border-color: #FFB800;
             color: #FFB800;
         }
+
+        /* 適合談生意按鈕樣式 */
         .filter-tag.business {
             color: #6C5CE7;
         }
@@ -262,6 +264,7 @@
             background: #EDE7F6;
             border-color: #6C5CE7;
             color: #6C5CE7;
+            box-shadow: 0 2px 6px rgba(108, 92, 231, 0.15);
         }
 
         .cuisine-select-wrapper {
@@ -750,6 +753,7 @@
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.20);
             animation: modalIn 0.25s ease;
+            position: relative;
         }
         @keyframes modalIn {
             from {
@@ -768,38 +772,6 @@
             color: #1A1A1A;
         }
 
-        /* ===== 關鍵修復：右上角關閉按鈕 ===== */
-        .modal-close-top {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 10;
-            /* 確保在表單之上 */;
-        }
-        .modal-close-top button {
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: #8A9AA8;
-            padding: 8px 12px;
-            cursor: pointer;
-            line-height: 1;
-            pointer-events: auto;
-            /* 確保可點擊 */
-            transition: color 0.2s;
-            font-weight: 300;
-        }
-        .modal-close-top button:hover {
-            color: #1A1A1A;
-        }
-        .modal-close-top button:active {
-            transform: scale(0.9);
-        }
-        .modal {
-            position: relative;
-        }
         .modal-close-top {
             position: absolute;
             top: 12px;
@@ -814,6 +786,7 @@
             cursor: pointer;
             padding: 4px 8px;
             line-height: 1;
+            transition: color 0.2s;
         }
         .modal-close-top button:hover {
             color: #1A1A1A;
@@ -939,7 +912,6 @@
             color: #FFA502;
         }
 
-        /* 地址搜尋建議下拉 */
         .address-suggestions {
             position: absolute;
             background: #FFFFFF;
@@ -981,6 +953,22 @@
         @media (max-width: 768px) {
             .sidebar {
                 display: none !important;
+            }
+
+            /* 確保頂部導航按鈕區域顯示 */
+            .app-header .header-actions {
+                display: flex !important;
+                align-items: center;
+                gap: 8px;
+            }
+            #openAddBtn {
+                display: inline-block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                z-index: 50 !important;
+                padding: 8px 16px;
+                font-size: 16px;
             }
 
             .app-body {
@@ -1264,11 +1252,11 @@
                 position: relative;
             }
             .modal .modal-close-top {
-                margin-bottom: 8px;
+                top: 8px;
+                right: 12px;
             }
             .modal .modal-close-top button {
                 font-size: 32px;
-                padding: 8px 12px;
             }
             .modal h2 {
                 font-size: 18px;
@@ -1344,7 +1332,7 @@
         <div class="app-body" id="appBody">
             <button class="toggle-map-btn" id="toggleMapBtn" title="折疊/展開地圖">▲</button>
 
-            <!-- 側邊欄 -->
+            <!-- 側邊欄 (桌面) -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-scroll">
                     <div class="sidebar-section">
@@ -1428,7 +1416,7 @@
                 <button class="locate-btn" id="locateBtn" title="定位到我">📍</button>
             </div>
 
-            <!-- 手機版餐廳列表 -->
+            <!-- 手機版餐廳列表 (折疊時顯示) -->
             <div class="mobile-restaurant-list" id="mobileRestaurantList"></div>
 
             <!-- 手機版 Filter -->
@@ -1493,22 +1481,19 @@
         </div>
     </div>
 
-    <!-- ===== 新增餐廳模態框 (只有右上角 ✕ 可關閉) ===== -->
+    <!-- ===== 新增餐廳模態框 ===== -->
     <div class="modal-overlay" id="addModal">
         <div class="modal">
-            <!-- 只保留右上角關閉按鈕，移除其他關閉方式 -->
             <div class="modal-close-top">
                 <button id="closeModalTopBtn" aria-label="關閉">✕</button>
             </div>
             <h2>➕ 新增餐廳</h2>
             <form id="addForm" autocomplete="off">
-                <!-- Password -->
                 <div class="form-group">
                     <label>管理員密碼 *</label>
                     <input type="password" id="fPassword" placeholder="請輸入管理密碼" required />
                     <div class="error-msg" id="pwdError">密碼錯誤，請重新輸入</div>
                 </div>
-                <!-- 餐廳名稱 -->
                 <div class="form-group">
                     <label>餐廳名稱 *</label>
                     <input type="text" id="fName" placeholder="例：君悅酒店" required />
@@ -1624,7 +1609,6 @@
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <!-- 移除「取消」按鈕，只保留「新增」按鈕 -->
                     <button type="submit" class="btn btn-success">✓ 新增餐廳</button>
                 </div>
             </form>
@@ -1633,7 +1617,7 @@
 
 
     <!-- ============================================================
-    JavaScript (ES Module)
+    JavaScript (ES Module) - 完整功能
     ============================================================ -->
     <script type="module">
         // =============================================================
@@ -2025,6 +2009,7 @@
         let activePrice = 'all';
         let activeStars = 'all';
         let activeCuisine = 'all';
+        // 適合談生意篩選狀態（多選）
         let filterBusiness = { environment: false, noise: false, few_people: false, private_room: false };
         let activePeriod = 'all';
 
@@ -2134,7 +2119,7 @@
         }
 
         // =============================================================
-        // 12. 地址搜尋與定位功能
+        // 12. 地址搜尋與定位功能 (保留)
         // =============================================================
 
         async function searchAddress(query, districtFilter) {
@@ -2146,7 +2131,6 @@
                 if (!response.ok) return [];
                 const data = await response.json();
                 if (!data || data.length === 0) return [];
-
                 let filtered = data;
                 if (districtFilter && districtFilter !== '' && districtFilter !== 'other') {
                     filtered = data.filter(item => item.districtZH === districtFilter);
@@ -2394,7 +2378,7 @@
         }
 
         // =============================================================
-        // 15. 過濾邏輯
+        // 15. 過濾邏輯 (多選 business)
         // =============================================================
 
         function getFilteredRestaurants() {
@@ -2423,11 +2407,8 @@
         }
 
         // =============================================================
-        // 16-23. 其餘過濾、篩選、列表等功能（與前相同，此處省略避免過長，實際使用請複製完整版本）
+        // 16. 側邊欄列表
         // =============================================================
-
-        // 此處為示意，實際請保留所有先前實作的過濾、列表、手機版等功能
-        // 為了保持可讀性，此處簡化，但完整檔案中所有功能皆保留
 
         function renderList(filtered) {
             const container = document.getElementById('restaurantList');
@@ -2492,6 +2473,10 @@
             });
         }
 
+        // =============================================================
+        // 17. 手機版列表
+        // =============================================================
+
         function renderMobileList(filtered) {
             const container = document.getElementById('mobileRestaurantList');
             if (!filtered || filtered.length === 0) {
@@ -2555,6 +2540,10 @@
             });
         }
 
+        // =============================================================
+        // 18. 地區按鈕
+        // =============================================================
+
         function renderDistrictButtons() {
             const grid = document.getElementById('districtGrid');
             let html = '<div class="district-tag active" data-district="">全部</div>';
@@ -2612,6 +2601,10 @@
                 el.classList.toggle('active', el.dataset.district === (value || ''));
             });
         }
+
+        // =============================================================
+        // 19. 價格與星級篩選
+        // =============================================================
 
         function setupFilters() {
             const priceContainer = document.getElementById('priceFilter');
@@ -2672,6 +2665,10 @@
             });
         }
 
+        // =============================================================
+        // 20. 品類下拉選單的監聽
+        // =============================================================
+
         function setupCuisineFilters() {
             const desktopSelect = document.getElementById('cuisineSelectDesktop');
             const mobileSelect = document.getElementById('cuisineSelectMobile');
@@ -2690,33 +2687,54 @@
             });
         }
 
+        // =============================================================
+        // 21. 適合談生意多選篩選 (事件代理，高亮與同步)
+        // =============================================================
+
         function setupBusinessFilters() {
             const desktopContainer = document.getElementById('businessFilter');
             const mobileContainer = document.getElementById('mobileBusinessFilter');
 
-            function handleBusinessToggle(element) {
-                const field = element.dataset.business;
-                element.classList.toggle('active');
-                filterBusiness[field] = element.classList.contains('active');
-                const otherContainer = element.closest('.filter-group') ? mobileContainer : desktopContainer;
-                const target = otherContainer.querySelector(`[data-business="${field}"]`);
-                if (target) {
-                    target.classList.toggle('active', filterBusiness[field]);
+            if (!desktopContainer && !mobileContainer) return;
+
+            function handleBusinessClick(e) {
+                const btn = e.target.closest('.filter-tag.business');
+                if (!btn) return;
+                const field = btn.dataset.business;
+                if (!field) return;
+
+                btn.classList.toggle('active');
+                const isActive = btn.classList.contains('active');
+
+                if (typeof filterBusiness !== 'undefined') {
+                    filterBusiness[field] = isActive;
                 }
-                renderMarkers();
+
+                const isInDesktop = desktopContainer && desktopContainer.contains(btn);
+                const otherContainer = isInDesktop ? mobileContainer : desktopContainer;
+                if (otherContainer) {
+                    const target = otherContainer.querySelector(`[data-business="${field}"]`);
+                    if (target) {
+                        target.classList.toggle('active', isActive);
+                    }
+                }
+
+                if (typeof renderMarkers === 'function') {
+                    renderMarkers();
+                }
             }
 
-            desktopContainer.querySelectorAll('.filter-tag.business').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    handleBusinessToggle(this);
-                });
-            });
-            mobileContainer.querySelectorAll('.filter-tag.business').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    handleBusinessToggle(this);
-                });
-            });
+            if (desktopContainer) {
+                desktopContainer.addEventListener('click', handleBusinessClick);
+            }
+            if (mobileContainer) {
+                mobileContainer.addEventListener('click', handleBusinessClick);
+            }
         }
+
+        // =============================================================
+        // 22. 推廣時段篩選
+        // =============================================================
 
         function setupPeriodFilters() {
             const desktopSelect = document.getElementById('periodSelectDesktop');
@@ -2735,6 +2753,10 @@
                 handlePeriodChange(this.value);
             });
         }
+
+        // =============================================================
+        // 23. 地圖折疊/展開功能
+        // =============================================================
 
         function toggleMap() {
             const appBody = document.getElementById('appBody');
@@ -2759,7 +2781,7 @@
         }
 
         // =============================================================
-        // 24. 新增餐廳 (重點：只有右上角 ✕ 可關閉)
+        // 24. 新增餐廳 (含密碼、地址搜尋、定位、business/periods 儲存)
         // =============================================================
 
         function setupAddForm() {
@@ -2960,7 +2982,7 @@
                 }
             });
 
-            // ===== 核心修復：只有右上角 ✕ 可關閉 =====
+            // 關閉模態框 (只有右上角 ✕)
             function closeModal() {
                 modal.classList.remove('open');
                 form.reset();
@@ -2985,11 +3007,7 @@
                 lngInput.value = '';
             }
 
-            // 只綁定右上角按鈕
             closeTopBtn.addEventListener('click', closeModal);
-
-            // 注意：此處沒有綁定 modal 點擊背景關閉，也沒有取消按鈕
-            // 所以只有右上角 ✕ 可以關閉
 
             // 開啟 modal
             openBtn.addEventListener('click', () => {
@@ -3175,11 +3193,10 @@
             renderDistrictButtons();
             setupFilters();
             setupCuisineFilters();
-            setupBusinessFilters();
             setupPeriodFilters();
             setupAddForm();
 
-            console.log('🍜 HW 飲食地圖已啟動 (右上角 ✕ 關閉修復)');
+            console.log('🍜 HW 飲食地圖已啟動 (手機新增按鈕已修復)');
             console.log('📌 管理密碼:', STATIC_PASSWORD);
         });
     </script>
