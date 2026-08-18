@@ -10,13 +10,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
 
-    <!-- ===== proj4js 座標轉換 ===== -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js">
-    </script>
-
     <style>
         /* ============================================================
-           全域樣式
+           全域樣式 (完整保留，僅修改相關文字)
            ============================================================ */
         * {
             margin: 0;
@@ -106,23 +102,6 @@
         .btn-edit:hover {
             background: #E6A500;
         }
-        .btn-geocode {
-            background: #6C5CE7;
-            color: #fff;
-            padding: 4px 14px;
-            font-size: 13px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-geocode:hover {
-            background: #5A4BD1;
-        }
-        .btn-geocode:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
 
         /* ---------- 主佈局 ---------- */
         .app-body {
@@ -132,7 +111,7 @@
             transition: all 0.3s ease;
         }
 
-        /* ---------- 側邊欄 ---------- */
+        /* ---------- 側邊欄 (桌面) ---------- */
         .sidebar {
             width: 340px;
             min-width: 340px;
@@ -255,8 +234,6 @@
             border-color: #FFB800;
             color: #FFB800;
         }
-
-        /* 適合談生意按鈕樣式 */
         .filter-tag.business {
             color: #6C5CE7;
         }
@@ -264,9 +241,9 @@
             background: #EDE7F6;
             border-color: #6C5CE7;
             color: #6C5CE7;
-            box-shadow: 0 2px 6px rgba(108, 92, 231, 0.15);
         }
 
+        /* 品類下拉選單 */
         .cuisine-select-wrapper {
             margin-top: 4px;
         }
@@ -290,6 +267,7 @@
             background: #EEF4FE;
         }
 
+        /* 推廣時段下拉 */
         .period-select-wrapper {
             margin-top: 4px;
         }
@@ -753,7 +731,6 @@
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.20);
             animation: modalIn 0.25s ease;
-            position: relative;
         }
         @keyframes modalIn {
             from {
@@ -771,27 +748,6 @@
             margin-bottom: 16px;
             color: #1A1A1A;
         }
-
-        .modal-close-top {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            z-index: 10;
-        }
-        .modal-close-top button {
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: #8A9AA8;
-            cursor: pointer;
-            padding: 4px 8px;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-        .modal-close-top button:hover {
-            color: #1A1A1A;
-        }
-
         .modal .form-group {
             margin-bottom: 12px;
         }
@@ -912,63 +868,12 @@
             color: #FFA502;
         }
 
-        .address-suggestions {
-            position: absolute;
-            background: #FFFFFF;
-            border: 1px solid #D0D7DE;
-            border-radius: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            width: calc(100% - 80px);
-            margin-top: 2px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            display: none;
-        }
-        .address-suggestions .suggestion-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 13px;
-            border-bottom: 1px solid #F1F3F5;
-            transition: background 0.15s;
-        }
-        .address-suggestions .suggestion-item:hover {
-            background: #EEF4FE;
-        }
-        .address-suggestions .suggestion-item:last-child {
-            border-bottom: none;
-        }
-        .address-suggestions .suggestion-item .suggestion-name {
-            font-weight: 500;
-            color: #1A1A1A;
-        }
-        .address-suggestions .suggestion-item .suggestion-addr {
-            font-size: 12px;
-            color: #8A9AA8;
-        }
-
         /* ============================================================
-           手機版
+           手機版 (含餐廳列表折疊顯示)
            ============================================================ */
         @media (max-width: 768px) {
             .sidebar {
                 display: none !important;
-            }
-
-            /* 確保頂部導航按鈕區域顯示 */
-            .app-header .header-actions {
-                display: flex !important;
-                align-items: center;
-                gap: 8px;
-            }
-            #openAddBtn {
-                display: inline-block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                pointer-events: auto !important;
-                z-index: 50 !important;
-                padding: 8px 16px;
-                font-size: 16px;
             }
 
             .app-body {
@@ -1146,6 +1051,29 @@
                 transition: flex 0.4s ease, height 0.4s ease;
             }
 
+            .mobile-filter-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 0 8px 2px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #4A5A6A;
+                border-bottom: 1px solid #F1F3F5;
+                margin-bottom: 8px;
+            }
+            .mobile-filter-header button {
+                background: none;
+                border: none;
+                font-size: 20px;
+                color: #8A9AA8;
+                cursor: pointer;
+                padding: 4px;
+            }
+            .mobile-filter-header button:hover {
+                color: #1A1A1A;
+            }
+
             .mobile-filter-bar .filter-label {
                 font-size: 12px;
                 font-weight: 600;
@@ -1218,6 +1146,35 @@
                 z-index: 500 !important;
             }
 
+            /* 篩選欄開關按鈕 (總是顯示) */
+            .filter-toggle-btn {
+                position: absolute;
+                top: 60px;  /* 放在摺疊地圖按鈕下方 */
+                right: 12px;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: #FFFFFF;
+                border: 1px solid rgba(0,0,0,0.06);
+                box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+                font-size: 16px;
+                color: #4A5A6A;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 600;
+            }
+            .filter-toggle-btn:hover {
+                background: #F0F7FF;
+                transform: scale(1.05);
+            }
+
+            /* 當篩選欄被隱藏時 */
+            .app-body.filter-hidden .mobile-filter-bar {
+                display: none !important;
+            }
+
             .modal-overlay {
                 position: fixed !important;
                 top: 0 !important;
@@ -1252,11 +1209,22 @@
                 position: relative;
             }
             .modal .modal-close-top {
-                top: 8px;
-                right: 12px;
+                display: flex !important;
+                justify-content: flex-end;
+                margin-bottom: 12px;
+                flex-shrink: 0;
             }
             .modal .modal-close-top button {
-                font-size: 32px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #8A9AA8;
+                padding: 8px;
+                cursor: pointer;
+                line-height: 1;
+            }
+            .modal .modal-close-top button:hover {
+                color: #1A1A1A;
             }
             .modal h2 {
                 font-size: 18px;
@@ -1281,6 +1249,10 @@
                 padding-top: 12px;
                 flex-shrink: 0;
             }
+            .modal .btn#closeAddBtn {
+                background: #F0F2F5;
+                color: #1A1A1A;
+            }
             .modal .btn-success {
                 width: auto;
                 padding: 8px 20px;
@@ -1297,6 +1269,9 @@
             .app-body {
                 padding-bottom: 0;
             }
+            .modal .modal-close-top {
+                display: none !important;
+            }
             .app-body.map-collapsed .map-container {
                 flex: 0 0 0 !important;
                 overflow: hidden !important;
@@ -1305,6 +1280,9 @@
             }
             .app-body.map-collapsed .sidebar {
                 flex: 1 !important;
+            }
+            .filter-toggle-btn {
+                display: none !important;
             }
         }
 
@@ -1363,21 +1341,18 @@
                             <select id="cuisineSelectDesktop">
                                 <option value="all">全部</option>
                                 <option value="港式">港式</option>
-                                <option value="中菜">中菜</option>
-                                <option value="粵菜">粵菜</option>
+                                <option value="魯菜">魯菜</option>
                                 <option value="川菜">川菜</option>
+                                <option value="粵菜">粵菜</option>
                                 <option value="台灣菜">台灣菜</option>
-                                <option value="其他中式">其他中式</option>
+                                <option value="其他中菜">其他中菜</option>
                                 <option value="日本菜">日本菜</option>
                                 <option value="韓國菜">韓國菜</option>
                                 <option value="泰國菜">泰國菜</option>
+                                <option value="海鮮">海鮮</option>
                                 <option value="西餐">西餐</option>
-                                <option value="美式">美式</option>
                                 <option value="火鍋">火鍋</option>
                                 <option value="咖啡廳">咖啡廳</option>
-                                <option value="素食">素食</option>
-                                <option value="甜品">甜品</option>
-                                <option value="其他">其他</option>
                             </select>
                         </div>
                     </div>
@@ -1385,7 +1360,7 @@
                         <h3>💼 適合談生意</h3>
                         <div class="filter-group" id="businessFilter">
                             <span class="filter-tag business" data-business="environment">🏢 環境體面</span>
-                            <span class="filter-tag business" data-business="noise">🔇 隔音良好</span>
+                            <span class="filter-tag business" data-business="noise">🔇 環境寧靜</span>
                             <span class="filter-tag business" data-business="few_people">👥 人數少</span>
                             <span class="filter-tag business" data-business="private_room">🚪 有包間</span>
                         </div>
@@ -1414,13 +1389,22 @@
                 <div id="map"></div>
                 <div class="locate-status" id="locateStatus">📍 定位中...</div>
                 <button class="locate-btn" id="locateBtn" title="定位到我">📍</button>
+                <!-- 篩選欄開關按鈕 (總是顯示) -->
+                <button class="filter-toggle-btn" id="toggleFilterBtn" title="顯示/隱藏篩選">✕</button>
             </div>
 
             <!-- 手機版餐廳列表 (折疊時顯示) -->
-            <div class="mobile-restaurant-list" id="mobileRestaurantList"></div>
+            <div class="mobile-restaurant-list" id="mobileRestaurantList">
+                <!-- 由 JS 動態填充 -->
+            </div>
 
             <!-- 手機版 Filter -->
             <div class="mobile-filter-bar" id="mobileFilterBar">
+                <!-- 篩選欄 header 與關閉按鈕 -->
+                <div class="mobile-filter-header">
+                    <span>🔍 篩選條件</span>
+                    <button id="closeFilterBtn" type="button" aria-label="關閉篩選">✕</button>
+                </div>
                 <div class="filter-label">🏙️ 地區</div>
                 <div class="filter-row district-row" id="mobileDistrictFilter"></div>
                 <div class="filter-label">💰 人均價格</div>
@@ -1442,29 +1426,26 @@
                     <select id="cuisineSelectMobile">
                         <option value="all">全部</option>
                         <option value="港式">港式</option>
-                        <option value="中菜">中菜</option>
-                        <option value="粵菜">粵菜</option>
+                        <option value="魯菜">魯菜</option>
                         <option value="川菜">川菜</option>
+                        <option value="粵菜">粵菜</option>
                         <option value="台灣菜">台灣菜</option>
-                        <option value="其他中式">其他中式</option>
+                        <option value="其他中菜">其他中菜</option>
                         <option value="日本菜">日本菜</option>
                         <option value="韓國菜">韓國菜</option>
                         <option value="泰國菜">泰國菜</option>
+                        <option value="海鮮">海鮮</option>
                         <option value="西餐">西餐</option>
-                        <option value="美式">美式</option>
                         <option value="火鍋">火鍋</option>
                         <option value="咖啡廳">咖啡廳</option>
-                        <option value="素食">素食</option>
-                        <option value="甜品">甜品</option>
-                        <option value="其他">其他</option>
                     </select>
                 </div>
                 <div class="filter-label">💼 適合談生意</div>
                 <div class="filter-row business-row" id="mobileBusinessFilter">
-                    <span class="filter-tag business" data-business="environment">🏢 環境</span>
-                    <span class="filter-tag business" data-business="noise">🔇 隔音</span>
+                    <span class="filter-tag business" data-business="environment">🏢 環境體面</span>
+                    <span class="filter-tag business" data-business="noise">🔇 環境寧靜</span>
                     <span class="filter-tag business" data-business="few_people">👥 人數少</span>
-                    <span class="filter-tag business" data-business="private_room">🚪 包間</span>
+                    <span class="filter-tag business" data-business="private_room">🚪 有包間</span>
                 </div>
                 <div class="filter-label">📅 推廣時段</div>
                 <div class="period-select-wrapper">
@@ -1496,16 +1477,7 @@
                 </div>
                 <div class="form-group">
                     <label>餐廳名稱 *</label>
-                    <input type="text" id="fName" placeholder="例：君悅酒店" required />
-                </div>
-                <div class="form-group" style="position:relative;">
-                    <label>地址 / 位置 *</label>
-                    <div style="display:flex; gap:8px;">
-                        <input type="text" id="fLocation" placeholder="自動搜尋或手動輸入" required style="flex:1;" />
-                        <button type="button" class="btn-geocode" id="geocodeBtn">📍 定位</button>
-                    </div>
-                    <div class="address-suggestions" id="addressSuggestions"></div>
-                    <div class="geocode-status" id="geocodeStatus">💡 輸入餐廳名稱會自動搜尋地址</div>
+                    <input type="text" id="fName" placeholder="例：龍景軒" required />
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1542,22 +1514,24 @@
                     <select id="fCuisine" required>
                         <option value="">請選擇</option>
                         <option value="港式">港式</option>
-                        <option value="中菜">中菜</option>
-                        <option value="粵菜">粵菜</option>
+                        <option value="魯菜">魯菜</option>
                         <option value="川菜">川菜</option>
+                        <option value="粵菜">粵菜</option>
                         <option value="台灣菜">台灣菜</option>
-                        <option value="其他中式">其他中式</option>
+                        <option value="其他中菜">其他中菜</option>
                         <option value="日本菜">日本菜</option>
                         <option value="韓國菜">韓國菜</option>
                         <option value="泰國菜">泰國菜</option>
+                        <option value="海鮮">海鮮</option>
                         <option value="西餐">西餐</option>
-                        <option value="美式">美式</option>
                         <option value="火鍋">火鍋</option>
                         <option value="咖啡廳">咖啡廳</option>
-                        <option value="素食">素食</option>
-                        <option value="甜品">甜品</option>
-                        <option value="其他">其他</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>地址 / 位置 *</label>
+                    <input type="text" id="fLocation" placeholder="灣仔港灣道1號君悅酒店大堂" required />
+                    <div class="geocode-status" id="geocodeStatus">💡 提交時會自動嘗試定位地址</div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1589,15 +1563,17 @@
                     <label>評論 / 備註</label>
                     <textarea id="fComment" placeholder="分享你的用餐體驗..."></textarea>
                 </div>
+                <!-- 適合談生意 (四項) -->
                 <div class="form-group">
                     <label>適合談生意</label>
                     <div class="business-checkbox-group">
                         <label><input type="checkbox" id="fBusinessEnvironment" /> 🏢 環境體面</label>
-                        <label><input type="checkbox" id="fBusinessNoise" /> 🔇 隔音良好</label>
+                        <label><input type="checkbox" id="fBusinessNoise" /> 🔇 環境寧靜</label>
                         <label><input type="checkbox" id="fBusinessFewPeople" /> 👥 人數少</label>
                         <label><input type="checkbox" id="fBusinessPrivateRoom" /> 🚪 有包間</label>
                     </div>
                 </div>
+                <!-- 推廣時段 (多選) -->
                 <div class="form-group">
                     <label>推廣時段 (選填，可多選)</label>
                     <div class="period-checkbox-group">
@@ -1609,6 +1585,7 @@
                     </div>
                 </div>
                 <div class="modal-actions">
+                    <button type="button" class="btn" id="closeAddBtn">取消</button>
                     <button type="submit" class="btn btn-success">✓ 新增餐廳</button>
                 </div>
             </form>
@@ -1722,17 +1699,11 @@
             [22.56, 114.40]
         ];
 
-        // =============================================================
-        // 5. 定義 HK1980 投影參數
-        // =============================================================
-
-        window.proj4.defs(
-            "HK1980",
-            "+proj=tmerc +lat_0=22.31213333333333 +lon_0=114.1785555555556 +k=1 +x_0=836694.05 +y_0=819069.8 +ellps=intl +towgs84=-162.619,-276.959,-161.764,0.067753,-2.65065,1.48355,-1.357 +units=m +no_defs"
-        );
+        const CUISINES = ['港式', '魯菜', '川菜', '粵菜', '台灣菜', '其他中菜', '日本菜', '韓國菜', '泰國菜', '海鮮', '西餐', '火鍋', '咖啡廳'];
+        const PERIODS = ['早餐', '中午', '下午茶', '晚餐', '宵夜'];
 
         // =============================================================
-        // 6. 預設範例資料
+        // 5. 預設範例資料 (更新 business 及新增 periods)
         // =============================================================
 
         function convertRating(oldRating) {
@@ -1765,7 +1736,7 @@
             district: '深水埗區',
             price: 'low',
             rating: 3,
-            cuisine: '粵菜點心',
+            cuisine: '粵菜',
             location: '深水埗福榮街9-11號地下',
             phone: '+852 2788 1226',
             hours: '10:00-21:30',
@@ -1837,7 +1808,7 @@
             district: '油尖旺區',
             price: 'low',
             rating: 3,
-            cuisine: '港式茶餐廳',
+            cuisine: '港式',
             location: '佐敦白加士街47-49號地下',
             phone: '+852 2730 1356',
             hours: '07:30-23:00',
@@ -1873,7 +1844,7 @@
             district: '中西區',
             price: 'low',
             rating: 2,
-            cuisine: '粵菜點心',
+            cuisine: '粵菜',
             location: '中環威靈頓街160-164號',
             phone: '+852 2544 4556',
             hours: '06:00-22:00',
@@ -1891,7 +1862,7 @@
             district: '南區',
             price: 'medium',
             rating: 2,
-            cuisine: '美式海鮮',
+            cuisine: '海鮮',
             location: '香港仔海傍道8號',
             phone: '+852 2552 8866',
             hours: '11:00-23:00',
@@ -1924,7 +1895,7 @@
         }];
 
         // =============================================================
-        // 7. 資料操作 (Firestore)
+        // 6. 資料操作 (Firestore)
         // =============================================================
 
         async function loadRestaurants() {
@@ -1997,7 +1968,7 @@
         }
 
         // =============================================================
-        // 8. 狀態變數
+        // 7. 狀態變數
         // =============================================================
 
         let restaurants = [];
@@ -2009,7 +1980,6 @@
         let activePrice = 'all';
         let activeStars = 'all';
         let activeCuisine = 'all';
-        // 適合談生意篩選狀態（多選）
         let filterBusiness = { environment: false, noise: false, few_people: false, private_room: false };
         let activePeriod = 'all';
 
@@ -2017,7 +1987,7 @@
         let focusCommentOnOpen = false;
 
         // =============================================================
-        // 9. 初始化地圖
+        // 8. 初始化地圖
         // =============================================================
 
         function initMap() {
@@ -2048,10 +2018,11 @@
             setupBusinessFilters();
             setupPeriodFilters();
             document.getElementById('toggleMapBtn').addEventListener('click', toggleMap);
+            setupFilterToggle(); // 初始設定篩選欄開關按鈕
         }
 
         // =============================================================
-        // 10. GPS 定位
+        // 9. GPS 定位
         // =============================================================
 
         const locateStatus = document.getElementById('locateStatus');
@@ -2105,7 +2076,7 @@
         }
 
         // =============================================================
-        // 11. 自訂標記圖標
+        // 10. 自訂標記圖標
         // =============================================================
 
         function createRestaurantIcon(color) {
@@ -2119,41 +2090,7 @@
         }
 
         // =============================================================
-        // 12. 地址搜尋與定位功能 (保留)
-        // =============================================================
-
-        async function searchAddress(query, districtFilter) {
-            if (!query || query.length < 2) return [];
-            try {
-                const url =
-                    `https://www.map.gov.hk/gs/api/v1.0.0/locationSearch?q=${encodeURIComponent(query)}`;
-                const response = await fetch(url);
-                if (!response.ok) return [];
-                const data = await response.json();
-                if (!data || data.length === 0) return [];
-                let filtered = data;
-                if (districtFilter && districtFilter !== '' && districtFilter !== 'other') {
-                    filtered = data.filter(item => item.districtZH === districtFilter);
-                }
-                return filtered.slice(0, 5).filter(item => item.nameZH || item.addressZH);
-            } catch (error) {
-                console.error('地址搜尋失敗:', error);
-                return [];
-            }
-        }
-
-        function convertHK1980toWGS84(x, y) {
-            try {
-                const result = window.proj4('HK1980', 'WGS84', [x, y]);
-                return { lat: result[1], lng: result[0] };
-            } catch (e) {
-                console.error('座標轉換失敗:', e);
-                return null;
-            }
-        }
-
-        // =============================================================
-        // 13. 構建彈窗內容
+        // 11. 構建彈窗內容
         // =============================================================
 
         function buildInfoWindowContent(r) {
@@ -2165,7 +2102,7 @@
             const bizHtml = `
                 <div class="iw-business">
                     <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
-                    <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音良好</span>
+                    <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 環境寧靜</span>
                     <span class="${biz.few_people ? 'yes' : 'no'}">${biz.few_people ? '✅' : '❌'} 人數少</span>
                     <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 有包間</span>
                 </div>
@@ -2234,6 +2171,7 @@
             return html;
         }
 
+        // 評論提交事件
         function bindCommentForm(popupContainer, restaurantId) {
             const form = popupContainer.querySelector('.iw-comment-form');
             if (!form) return;
@@ -2317,7 +2255,7 @@
         }
 
         // =============================================================
-        // 14. 渲染標記
+        // 12. 渲染標記
         // =============================================================
 
         function renderMarkers() {
@@ -2378,7 +2316,7 @@
         }
 
         // =============================================================
-        // 15. 過濾邏輯 (多選 business)
+        // 13. 過濾邏輯
         // =============================================================
 
         function getFilteredRestaurants() {
@@ -2407,7 +2345,7 @@
         }
 
         // =============================================================
-        // 16. 側邊欄列表
+        // 14. 側邊欄列表 (桌面)
         // =============================================================
 
         function renderList(filtered) {
@@ -2425,10 +2363,10 @@
                 const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
                 const bizTags =
                     `<div class="business-tags">
-                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境</span>
-                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音</span>
+                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
+                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 環境寧靜</span>
                         <span class="${biz.few_people ? 'yes' : 'no'}">${biz.few_people ? '✅' : '❌'} 人數少</span>
-                        <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 包間</span>
+                        <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 有包間</span>
                     </div>`;
                 let periodTags = '';
                 if (r.promotionPeriods && r.promotionPeriods.length > 0) {
@@ -2474,7 +2412,7 @@
         }
 
         // =============================================================
-        // 17. 手機版列表
+        // 15. 手機版列表 (與桌面同步)
         // =============================================================
 
         function renderMobileList(filtered) {
@@ -2492,10 +2430,10 @@
                 const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
                 const bizTags =
                     `<div class="business-tags">
-                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境</span>
-                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 隔音</span>
+                        <span class="${biz.environment ? 'yes' : 'no'}">${biz.environment ? '✅' : '❌'} 環境體面</span>
+                        <span class="${biz.noise ? 'yes' : 'no'}">${biz.noise ? '✅' : '❌'} 環境寧靜</span>
                         <span class="${biz.few_people ? 'yes' : 'no'}">${biz.few_people ? '✅' : '❌'} 人數少</span>
-                        <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 包間</span>
+                        <span class="${biz.private_room ? 'yes' : 'no'}">${biz.private_room ? '✅' : '❌'} 有包間</span>
                     </div>`;
                 let periodTags = '';
                 if (r.promotionPeriods && r.promotionPeriods.length > 0) {
@@ -2541,7 +2479,7 @@
         }
 
         // =============================================================
-        // 18. 地區按鈕
+        // 16. 地區按鈕
         // =============================================================
 
         function renderDistrictButtons() {
@@ -2603,7 +2541,7 @@
         }
 
         // =============================================================
-        // 19. 價格與星級篩選
+        // 17. 價格與星級篩選
         // =============================================================
 
         function setupFilters() {
@@ -2666,7 +2604,7 @@
         }
 
         // =============================================================
-        // 20. 品類下拉選單的監聽
+        // 18. 品類下拉選單
         // =============================================================
 
         function setupCuisineFilters() {
@@ -2688,52 +2626,39 @@
         }
 
         // =============================================================
-        // 21. 適合談生意多選篩選 (事件代理，高亮與同步)
+        // 19. 適合談生意篩選按鈕
         // =============================================================
 
         function setupBusinessFilters() {
             const desktopContainer = document.getElementById('businessFilter');
             const mobileContainer = document.getElementById('mobileBusinessFilter');
 
-            if (!desktopContainer && !mobileContainer) return;
-
-            function handleBusinessClick(e) {
-                const btn = e.target.closest('.filter-tag.business');
-                if (!btn) return;
-                const field = btn.dataset.business;
-                if (!field) return;
-
-                btn.classList.toggle('active');
-                const isActive = btn.classList.contains('active');
-
-                if (typeof filterBusiness !== 'undefined') {
-                    filterBusiness[field] = isActive;
+            function handleBusinessToggle(element) {
+                const field = element.dataset.business;
+                element.classList.toggle('active');
+                filterBusiness[field] = element.classList.contains('active');
+                const otherContainer = element.closest('.filter-group') ? mobileContainer : desktopContainer;
+                const target = otherContainer.querySelector(`[data-business="${field}"]`);
+                if (target) {
+                    target.classList.toggle('active', filterBusiness[field]);
                 }
-
-                const isInDesktop = desktopContainer && desktopContainer.contains(btn);
-                const otherContainer = isInDesktop ? mobileContainer : desktopContainer;
-                if (otherContainer) {
-                    const target = otherContainer.querySelector(`[data-business="${field}"]`);
-                    if (target) {
-                        target.classList.toggle('active', isActive);
-                    }
-                }
-
-                if (typeof renderMarkers === 'function') {
-                    renderMarkers();
-                }
+                renderMarkers();
             }
 
-            if (desktopContainer) {
-                desktopContainer.addEventListener('click', handleBusinessClick);
-            }
-            if (mobileContainer) {
-                mobileContainer.addEventListener('click', handleBusinessClick);
-            }
+            desktopContainer.querySelectorAll('.filter-tag.business').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    handleBusinessToggle(this);
+                });
+            });
+            mobileContainer.querySelectorAll('.filter-tag.business').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    handleBusinessToggle(this);
+                });
+            });
         }
 
         // =============================================================
-        // 22. 推廣時段篩選
+        // 20. 推廣時段篩選
         // =============================================================
 
         function setupPeriodFilters() {
@@ -2755,7 +2680,7 @@
         }
 
         // =============================================================
-        // 23. 地圖折疊/展開功能
+        // 21. 地圖折疊/展開功能
         // =============================================================
 
         function toggleMap() {
@@ -2781,12 +2706,118 @@
         }
 
         // =============================================================
-        // 24. 新增餐廳 (含密碼、地址搜尋、定位、business/periods 儲存)
+        // 22. 篩選欄開關 (手機版) - 使用單一按鈕切換
+        // =============================================================
+
+        function setupFilterToggle() {
+            const appBody = document.getElementById('appBody');
+            const closeFilterBtn = document.getElementById('closeFilterBtn');
+            const toggleFilterBtn = document.getElementById('toggleFilterBtn');
+
+            if (!closeFilterBtn || !toggleFilterBtn) return;
+
+            // 初始狀態：篩選欄可見，按鈕顯示關閉圖示
+            toggleFilterBtn.textContent = '✕';
+
+            function toggleFilter() {
+                const isHidden = appBody.classList.toggle('filter-hidden');
+                // 更新按鈕圖示
+                toggleFilterBtn.textContent = isHidden ? '🔍' : '✕';
+                setTimeout(() => { if (map) map.invalidateSize(); }, 400);
+            }
+
+            // 篩選欄內的關閉按鈕
+            closeFilterBtn.addEventListener('click', function() {
+                appBody.classList.add('filter-hidden');
+                toggleFilterBtn.textContent = '🔍';
+                setTimeout(() => { if (map) map.invalidateSize(); }, 400);
+            });
+
+            // 地圖上的切換按鈕
+            toggleFilterBtn.addEventListener('click', toggleFilter);
+        }
+
+        // =============================================================
+        // 23. 地址定位功能
+        // =============================================================
+
+        async function searchAddressAndGetCoordinates(address, targetDistrict) {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const searchUrl =
+                `https://www.map.gov.hk/gs/api/v1.0.0/locationSearch?q=${encodeURIComponent(address)}`;
+
+            try {
+                const response = await fetch(proxyUrl + encodeURIComponent(searchUrl));
+                if (!response.ok) throw new Error(`搜尋 API 失敗: ${response.status}`);
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    return { error: '找不到任何結果' };
+                }
+
+                let filtered = data;
+                if (targetDistrict) {
+                    filtered = data.filter(item => item.districtZH === targetDistrict);
+                }
+                if (filtered.length === 0) {
+                    filtered = data.slice(0, 1);
+                }
+
+                const result = filtered[0];
+                const hkX = result.x;
+                const hkY = result.y;
+
+                if (!hkX || !hkY) {
+                    return { error: '結果缺少座標資訊' };
+                }
+
+                const convertUrl =
+                    `https://data.gov.hk/api/coordinate-conversion-api/v1/convert?input=hk1980&output=wgs84&x=${hkX}&y=${hkY}`;
+                const convertResponse = await fetch(proxyUrl + encodeURIComponent(convertUrl));
+                if (!convertResponse.ok) throw new Error(`轉換 API 失敗: ${convertResponse.status}`);
+                const convertData = await convertResponse.json();
+
+                let lat, lng;
+                if (convertData.wgs84) {
+                    lat = convertData.wgs84.lat;
+                    lng = convertData.wgs84.lng;
+                } else if (convertData.lat && convertData.lng) {
+                    lat = convertData.lat;
+                    lng = convertData.lng;
+                } else if (convertData.result && convertData.result.wgs84) {
+                    lat = convertData.result.wgs84.lat;
+                    lng = convertData.result.wgs84.lng;
+                } else {
+                    lat = convertData.lat || convertData.result?.lat;
+                    lng = convertData.lng || convertData.result?.lng;
+                }
+
+                if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+                    return { error: '座標轉換失敗，請稍後重試' };
+                }
+
+                return {
+                    lat: parseFloat(lat),
+                    lng: parseFloat(lng),
+                    district: result.districtZH,
+                    name: result.nameZH || result.nameEN || '搜尋結果',
+                    address: result.addressZH || result.addressEN || address,
+                    raw: result
+                };
+            } catch (error) {
+                console.error('地址搜尋或轉換失敗:', error);
+                return { error: '連線失敗，請稍後重試。若持續失敗，請檢查網路或代理服務。' };
+            }
+        }
+
+        // =============================================================
+        // 24. 新增餐廳
         // =============================================================
 
         function setupAddForm() {
             const modal = document.getElementById('addModal');
             const openBtn = document.getElementById('openAddBtn');
+            const closeBtn = document.getElementById('closeAddBtn');
             const closeTopBtn = document.getElementById('closeModalTopBtn');
             const form = document.getElementById('addForm');
             const districtSelect = document.getElementById('fDistrict');
@@ -2794,23 +2825,17 @@
             const customDistrictInput = document.getElementById('fCustomDistrict');
             const pwdInput = document.getElementById('fPassword');
             const pwdError = document.getElementById('pwdError');
-            const geocodeBtn = document.getElementById('geocodeBtn');
             const geocodeStatus = document.getElementById('geocodeStatus');
             const latInput = document.getElementById('fLat');
             const lngInput = document.getElementById('fLng');
-            const nameInput = document.getElementById('fName');
-            const locationInput = document.getElementById('fLocation');
-            const suggestionsDiv = document.getElementById('addressSuggestions');
 
             const envCheck = document.getElementById('fBusinessEnvironment');
             const noiseCheck = document.getElementById('fBusinessNoise');
             const fewPeopleCheck = document.getElementById('fBusinessFewPeople');
             const privateRoomCheck = document.getElementById('fBusinessPrivateRoom');
+
             const periodChecks = document.querySelectorAll('.period-check');
 
-            let searchTimeout = null;
-
-            // 地區選項
             const optOther = document.createElement('option');
             optOther.value = 'other';
             optOther.textContent = '其他 (自訂)';
@@ -2831,158 +2856,6 @@
                 }
             });
 
-            // 餐廳名稱輸入時自動搜尋地址
-            nameInput.addEventListener('input', function() {
-                const query = this.value.trim();
-                clearTimeout(searchTimeout);
-                if (query.length < 2) {
-                    suggestionsDiv.style.display = 'none';
-                    return;
-                }
-                const selectedDistrict = districtSelect.value;
-                searchTimeout = setTimeout(async () => {
-                    const results = await searchAddress(query, selectedDistrict);
-                    if (results.length === 0) {
-                        suggestionsDiv.style.display = 'none';
-                        return;
-                    }
-                    let html = '';
-                    results.forEach(item => {
-                        const name = item.nameZH || item.nameEN || '';
-                        const addr = item.addressZH || item.addressEN || '';
-                        html += `
-                            <div class="suggestion-item" data-x="${item.x}" data-y="${item.y}" data-district="${item.districtZH || ''}" data-name="${escapeHtml(name)}" data-address="${escapeHtml(addr)}">
-                                <div class="suggestion-name">${escapeHtml(name)}</div>
-                                <div class="suggestion-addr">${escapeHtml(addr)}</div>
-                            </div>
-                        `;
-                    });
-                    suggestionsDiv.innerHTML = html;
-                    suggestionsDiv.style.display = 'block';
-
-                    suggestionsDiv.querySelectorAll('.suggestion-item').forEach(el => {
-                        el.addEventListener('click', function() {
-                            const x = parseFloat(this.dataset.x);
-                            const y = parseFloat(this.dataset.y);
-                            const district = this.dataset.district;
-                            const name = this.dataset.name;
-                            const address = this.dataset.address;
-
-                            locationInput.value = address || name;
-                            if (district && districtSelect.value === '') {
-                                const opt = districtSelect.querySelector(
-                                    `option[value="${district}"]`);
-                                if (opt) districtSelect.value = district;
-                            }
-                            if (x && y) {
-                                const coords = convertHK1980toWGS84(x, y);
-                                if (coords) {
-                                    latInput.value = coords.lat.toFixed(6);
-                                    lngInput.value = coords.lng.toFixed(6);
-                                    geocodeStatus.textContent = `✅ 已定位：${name} (${district || ''})`;
-                                    geocodeStatus.className = 'geocode-status success';
-                                    if (geocodeMarker) map.removeLayer(geocodeMarker);
-                                    const icon = L.divIcon({
-                                        html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
-                                        className: '',
-                                        iconSize: [24, 24],
-                                        iconAnchor: [12, 12]
-                                    });
-                                    geocodeMarker = L.marker([coords.lat, coords.lng], { icon: icon })
-                                        .addTo(map)
-                                        .bindPopup(`📍 ${escapeHtml(name || '搜尋結果')}`)
-                                        .openPopup();
-                                    map.setView([coords.lat, coords.lng], 16);
-                                }
-                            }
-                            suggestionsDiv.style.display = 'none';
-                        });
-                    });
-                }, 400);
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!suggestionsDiv.contains(e.target) && e.target !== nameInput) {
-                    suggestionsDiv.style.display = 'none';
-                }
-            });
-
-            // 定位按鈕
-            geocodeBtn.addEventListener('click', async function() {
-                const address = locationInput.value.trim();
-                if (!address) {
-                    geocodeStatus.textContent = '⚠️ 請先輸入地址';
-                    geocodeStatus.className = 'geocode-status error';
-                    return;
-                }
-                let district = districtSelect.value;
-                if (district === 'other') {
-                    district = customDistrictInput.value.trim() || null;
-                } else if (!district) {
-                    district = null;
-                }
-                geocodeStatus.textContent = '⏳ 搜尋地址中...';
-                geocodeStatus.className = 'geocode-status loading';
-                geocodeBtn.disabled = true;
-                geocodeBtn.textContent = '搜尋中...';
-                if (geocodeMarker) {
-                    map.removeLayer(geocodeMarker);
-                    geocodeMarker = null;
-                }
-                try {
-                    const results = await searchAddress(address, district);
-                    if (!results || results.length === 0) {
-                        geocodeStatus.textContent = '❌ 找不到該地址（或該地區無結果）';
-                        geocodeStatus.className = 'geocode-status error';
-                        geocodeBtn.disabled = false;
-                        geocodeBtn.textContent = '📍 定位';
-                        return;
-                    }
-                    const result = results[0];
-                    const x = result.x;
-                    const y = result.y;
-                    const name = result.nameZH || result.nameEN || '搜尋結果';
-                    if (!x || !y) {
-                        geocodeStatus.textContent = '❌ 結果缺少座標資訊';
-                        geocodeStatus.className = 'geocode-status error';
-                        geocodeBtn.disabled = false;
-                        geocodeBtn.textContent = '📍 定位';
-                        return;
-                    }
-                    const coords = convertHK1980toWGS84(x, y);
-                    if (!coords) {
-                        geocodeStatus.textContent = '❌ 座標轉換失敗';
-                        geocodeStatus.className = 'geocode-status error';
-                        geocodeBtn.disabled = false;
-                        geocodeBtn.textContent = '📍 定位';
-                        return;
-                    }
-                    latInput.value = coords.lat.toFixed(6);
-                    lngInput.value = coords.lng.toFixed(6);
-                    geocodeStatus.textContent = `✅ 已定位：${name} (${result.districtZH || ''})`;
-                    geocodeStatus.className = 'geocode-status success';
-                    const icon = L.divIcon({
-                        html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
-                        className: '',
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    });
-                    geocodeMarker = L.marker([coords.lat, coords.lng], { icon: icon })
-                        .addTo(map)
-                        .bindPopup(`📍 ${escapeHtml(name)}`)
-                        .openPopup();
-                    map.setView([coords.lat, coords.lng], 16);
-                } catch (error) {
-                    console.error('定位失敗:', error);
-                    geocodeStatus.textContent = '❌ 定位失敗，請稍後重試';
-                    geocodeStatus.className = 'geocode-status error';
-                } finally {
-                    geocodeBtn.disabled = false;
-                    geocodeBtn.textContent = '📍 定位';
-                }
-            });
-
-            // 關閉模態框 (只有右上角 ✕)
             function closeModal() {
                 modal.classList.remove('open');
                 form.reset();
@@ -2998,8 +2871,7 @@
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
                 }
-                suggestionsDiv.style.display = 'none';
-                geocodeStatus.textContent = '💡 輸入餐廳名稱會自動搜尋地址';
+                geocodeStatus.textContent = '💡 提交時會自動嘗試定位地址';
                 geocodeStatus.className = 'geocode-status';
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) submitBtn.textContent = '✓ 新增餐廳';
@@ -3007,9 +2879,6 @@
                 lngInput.value = '';
             }
 
-            closeTopBtn.addEventListener('click', closeModal);
-
-            // 開啟 modal
             openBtn.addEventListener('click', () => {
                 modal.classList.add('open');
                 if (activeDistrict && activeDistrict !== 'other') {
@@ -3018,7 +2887,7 @@
                     districtSelect.value = '';
                 }
                 customDistrictGroup.style.display = 'none';
-                nameInput.focus();
+                document.getElementById('fName').focus();
                 pwdInput.value = '';
                 pwdError.classList.remove('show');
                 envCheck.checked = false;
@@ -3030,14 +2899,18 @@
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
                 }
-                suggestionsDiv.style.display = 'none';
-                geocodeStatus.textContent = '💡 輸入餐廳名稱會自動搜尋地址';
+                geocodeStatus.textContent = '💡 提交時會自動嘗試定位地址';
                 geocodeStatus.className = 'geocode-status';
                 latInput.value = '';
                 lngInput.value = '';
             });
 
-            // 表單提交
+            closeBtn.addEventListener('click', closeModal);
+            closeTopBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -3050,12 +2923,12 @@
                 }
                 pwdError.classList.remove('show');
 
-                const name = nameInput.value.trim();
-                let district = districtSelect.value;
+                const name = document.getElementById('fName').value.trim();
+                let district = document.getElementById('fDistrict').value;
                 const price = document.getElementById('fPrice').value;
                 const rating = parseInt(document.getElementById('fRating').value);
                 const cuisine = document.getElementById('fCuisine').value;
-                const location = locationInput.value.trim();
+                const location = document.getElementById('fLocation').value.trim();
                 const phone = document.getElementById('fPhone').value.trim();
                 const hours = document.getElementById('fHours').value.trim();
                 const recommender = document.getElementById('fRecommender').value.trim();
@@ -3081,10 +2954,10 @@
                     district = custom;
                 } else if (!district) { alert('請選擇地區。'); return; }
 
-                if (!isValidName(name)) { alert('名稱需1~50字'); nameInput.focus(); return; }
+                if (!isValidName(name)) { alert('名稱需1~50字'); document.getElementById('fName').focus(); return; }
                 if (!['high', 'medium', 'low'].includes(price)) { alert('價格錯誤'); return; }
                 if (![1, 2, 3].includes(rating)) { alert('評分錯誤'); return; }
-                if (!isValidLocation(location)) { alert('地址錯誤'); locationInput.focus(); return; }
+                if (!isValidLocation(location)) { alert('地址錯誤'); document.getElementById('fLocation').focus(); return; }
                 if (!isValidPhone(phone)) { alert('電話格式錯誤'); document.getElementById('fPhone').focus(); return; }
                 if (!isValidUrl(image)) { alert('圖片網址錯誤'); document.getElementById('fImage').focus(); return; }
                 if (hours.length > 30) { alert('營業時間過長'); document.getElementById('fHours').focus(); return; }
@@ -3093,6 +2966,59 @@
 
                 let lat = parseFloat(latInput.value);
                 let lng = parseFloat(lngInput.value);
+                if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+                    geocodeStatus.textContent = '⏳ 正在定位地址...';
+                    geocodeStatus.className = 'geocode-status loading';
+                    const result = await searchAddressAndGetCoordinates(location, district);
+                    if (result.error) {
+                        geocodeStatus.textContent = '⚠️ 自動定位失敗，使用地區中心點';
+                        geocodeStatus.className = 'geocode-status error';
+                        const baseCoords = {
+                            '中西區': { lat: 22.285, lng: 114.155 },
+                            '灣仔區': { lat: 22.278, lng: 114.178 },
+                            '東區': { lat: 22.282, lng: 114.225 },
+                            '南區': { lat: 22.248, lng: 114.153 },
+                            '油尖旺區': { lat: 22.305, lng: 114.171 },
+                            '深水埗區': { lat: 22.331, lng: 114.163 },
+                            '九龍城區': { lat: 22.327, lng: 114.187 },
+                            '黃大仙區': { lat: 22.342, lng: 114.196 },
+                            '觀塘區': { lat: 22.315, lng: 114.226 },
+                            '荃灣區': { lat: 22.370, lng: 114.114 },
+                            '屯門區': { lat: 22.391, lng: 113.978 },
+                            '元朗區': { lat: 22.443, lng: 114.022 },
+                            '北區': { lat: 22.495, lng: 114.138 },
+                            '大埔區': { lat: 22.453, lng: 114.163 },
+                            '沙田區': { lat: 22.383, lng: 114.192 },
+                            '西貢區': { lat: 22.381, lng: 114.275 },
+                            '離島區': { lat: 22.261, lng: 113.946 },
+                            '葵青區': { lat: 22.364, lng: 114.132 }
+                        };
+                        const base = baseCoords[district] || { lat: 22.3193, lng: 114.1694 };
+                        lat = base.lat + (Math.random() - 0.5) * 0.008;
+                        lng = base.lng + (Math.random() - 0.5) * 0.008;
+                    } else {
+                        lat = result.lat;
+                        lng = result.lng;
+                        geocodeStatus.textContent =
+                            `✅ 定位成功：${result.name} (${result.district || ''})`;
+                        geocodeStatus.className = 'geocode-status success';
+                        if (geocodeMarker) map.removeLayer(geocodeMarker);
+                        const icon = L.divIcon({
+                            html: `<div style="background:#6C5CE7;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍</div>`,
+                            className: '',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        });
+                        geocodeMarker = L.marker([lat, lng], { icon: icon })
+                            .addTo(map)
+                            .bindPopup(`📍 ${escapeHtml(result.name || result.address || '搜尋結果')}`)
+                            .openPopup();
+                        map.setView([lat, lng], 16);
+                    }
+                } else {
+                    geocodeStatus.textContent = '✅ 使用手動輸入的經緯度';
+                    geocodeStatus.className = 'geocode-status success';
+                }
 
                 if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
                     const baseCoords = {
@@ -3192,11 +3118,9 @@
             initMap();
             renderDistrictButtons();
             setupFilters();
-            setupCuisineFilters();
-            setupPeriodFilters();
             setupAddForm();
 
-            console.log('🍜 HW 飲食地圖已啟動 (手機新增按鈕已修復)');
+            console.log('🍜 HW 飲食地圖已啟動 (更新生意項目、時段、文字)');
             console.log('📌 管理密碼:', STATIC_PASSWORD);
         });
     </script>
