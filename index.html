@@ -1413,6 +1413,7 @@
                                 <option value="西餐">西餐</option>
                                 <option value="火鍋">火鍋</option>
                                 <option value="咖啡廳">咖啡廳</option>
+                                <!-- 注意：打卡地點不會在這裡，將由 activateHiddenMode() 動態加入 -->
                             </select>
                         </div>
                     </div>
@@ -1462,7 +1463,6 @@
 
             <!-- 手機版 Filter -->
             <div class="mobile-filter-bar" id="mobileFilterBar">
-                <!-- 篩選欄 header 與關閉按鈕 -->
                 <div class="mobile-filter-header">
                     <span>🔍 篩選條件</span>
                     <button id="closeFilterBtn" type="button" aria-label="關閉篩選">✕</button>
@@ -1500,6 +1500,7 @@
                         <option value="西餐">西餐</option>
                         <option value="火鍋">火鍋</option>
                         <option value="咖啡廳">咖啡廳</option>
+                        <!-- 打卡地點將動態加入 -->
                     </select>
                 </div>
                 <div class="filter-label">💼 適合談生意</div>
@@ -1588,6 +1589,7 @@
                         <option value="西餐">西餐</option>
                         <option value="火鍋">火鍋</option>
                         <option value="咖啡廳">咖啡廳</option>
+                        <!-- 打卡地點將動態加入 -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -1812,150 +1814,6 @@
             comments: [{ text: '每次去都要排隊！', timestamp: '2026-07-30 12:20', recommender: '張太' }],
             business: { environment: false, noise: false, few_people: false, private_room: false },
             promotionPeriods: ['午餐', '下午茶']
-        }, {
-            id: 'r3',
-            name: '一樂燒鵝',
-            district: '中西區',
-            price: 'medium',
-            rating: 3,
-            cuisine: '燒味',
-            location: '中環士丹利街34-38號地舖',
-            phone: '+852 2524 3888',
-            hours: '10:00-20:30',
-            image: '',
-            comment: '馳名燒鵝，皮脆肉嫩。',
-            recommender: '',
-            lat: 22.2829,
-            lng: 114.1579,
-            comments: [],
-            business: { environment: false, noise: false, few_people: false, private_room: false },
-            promotionPeriods: ['午餐', '晚餐']
-        }, {
-            id: 'r4',
-            name: '甘牌燒鵝',
-            district: '灣仔區',
-            price: 'medium',
-            rating: 3,
-            cuisine: '燒味',
-            location: '灣仔軒尼詩道226號地下',
-            phone: '+852 2520 1110',
-            hours: '11:30-21:30',
-            image: '',
-            comment: '連續多年米其林一星。',
-            recommender: '張先生',
-            lat: 22.2783,
-            lng: 114.1779,
-            comments: [],
-            business: { environment: false, noise: false, few_people: false, private_room: false },
-            promotionPeriods: ['午餐', '晚餐']
-        }, {
-            id: 'r5',
-            name: '九記牛腩',
-            district: '中西區',
-            price: 'low',
-            rating: 3,
-            cuisine: '港式',
-            location: '中環歌賦街21號地舖',
-            phone: '+852 2850 5962',
-            hours: '12:30-22:30',
-            image: '',
-            comment: '清湯牛腩伊麵，老字號。',
-            recommender: '',
-            lat: 22.2853,
-            lng: 114.1547,
-            comments: [],
-            business: { environment: false, noise: false, few_people: false, private_room: false },
-            promotionPeriods: ['午餐', '晚餐', '宵夜']
-        }, {
-            id: 'r6',
-            name: '澳洲牛奶公司',
-            district: '油尖旺區',
-            price: 'low',
-            rating: 3,
-            cuisine: '港式',
-            location: '佐敦白加士街47-49號地下',
-            phone: '+852 2730 1356',
-            hours: '07:30-23:00',
-            image: '',
-            comment: '燉奶、炒蛋多士。',
-            recommender: '李太',
-            lat: 22.3054,
-            lng: 114.1714,
-            comments: [],
-            business: { environment: false, noise: false, few_people: false, private_room: false },
-            promotionPeriods: ['早餐', '午餐']
-        }, {
-            id: 'r7',
-            name: '鏞記酒家',
-            district: '中西區',
-            price: 'high',
-            rating: 3,
-            cuisine: '粵菜',
-            location: '中環威靈頓街32-40號',
-            phone: '+852 2522 1624',
-            hours: '11:00-23:00',
-            image: '',
-            comment: '經典老牌粵菜。',
-            recommender: '',
-            lat: 22.2837,
-            lng: 114.1570,
-            comments: [],
-            business: { environment: true, noise: false, few_people: false, private_room: true },
-            promotionPeriods: ['午餐', '晚餐']
-        }, {
-            id: 'r8',
-            name: '蓮香樓',
-            district: '中西區',
-            price: 'low',
-            rating: 2,
-            cuisine: '粵菜',
-            location: '中環威靈頓街160-164號',
-            phone: '+852 2544 4556',
-            hours: '06:00-22:00',
-            image: '',
-            comment: '懷舊茶樓，推車點心。',
-            recommender: '',
-            lat: 22.2844,
-            lng: 114.1543,
-            comments: [],
-            business: { environment: false, noise: false, few_people: false, private_room: false },
-            promotionPeriods: ['早餐', '午餐', '下午茶']
-        }, {
-            id: 'r9',
-            name: '阿甘蝦餐廳',
-            district: '南區',
-            price: 'medium',
-            rating: 2,
-            cuisine: '海鮮',
-            location: '香港仔海傍道8號',
-            phone: '+852 2552 8866',
-            hours: '11:00-23:00',
-            image: '',
-            comment: '海景餐廳，招牌蝦料理。',
-            recommender: '食客王',
-            lat: 22.2483,
-            lng: 114.1535,
-            comments: [],
-            business: { environment: true, noise: false, few_people: false, private_room: false },
-            promotionPeriods: ['午餐', '晚餐']
-        }, {
-            id: 'r10',
-            name: '大班樓',
-            district: '中西區',
-            price: 'high',
-            rating: 3,
-            cuisine: '粵菜',
-            location: '中環九如坊18號',
-            phone: '+852 2555 2202',
-            hours: '12:00-15:00, 18:30-23:00',
-            image: '',
-            comment: '傳統粵菜，招牌話梅排骨。',
-            recommender: '',
-            lat: 22.2847,
-            lng: 114.1554,
-            comments: [],
-            business: { environment: true, noise: true, few_people: false, private_room: true },
-            promotionPeriods: ['午餐', '晚餐']
         }];
 
         // =============================================================
@@ -2514,21 +2372,36 @@
 
         function getFilteredRestaurants() {
             return restaurants.filter(r => {
+                // 地區過濾
                 if (activeDistrict === 'other') {
                     if (DISTRICTS.includes(r.district)) return false;
-                } else if (activeDistrict) {
-                    if (r.district !== activeDistrict) return false;
+                } else if (activeDistrict && r.district !== activeDistrict) {
+                    return false;
                 }
-                if (activePrice !== 'all' && r.price !== activePrice) return false;
-                if (activeStars !== 'all' && r.rating !== parseInt(activeStars)) return false;
-                if (activeCuisine !== 'all' && r.cuisine !== activeCuisine) return false;
 
+                // 價格過濾
+                if (activePrice !== 'all' && r.price !== activePrice) return false;
+
+                // 星級過濾
+                if (activeStars !== 'all' && r.rating !== parseInt(activeStars)) return false;
+
+                // 品類過濾
+                if (activeCuisine !== 'all') {
+                    // 指定品類時必須完全匹配
+                    if (r.cuisine !== activeCuisine) return false;
+                } else {
+                    // 「全部」不包含打卡地點
+                    if (r.cuisine === '打卡地點' && !hiddenModeActive) return false;
+                }
+
+                // 生意特性過濾
                 const biz = r.business || { environment: false, noise: false, few_people: false, private_room: false };
                 if (filterBusiness.environment && !biz.environment) return false;
                 if (filterBusiness.noise && !biz.noise) return false;
                 if (filterBusiness.few_people && !biz.few_people) return false;
                 if (filterBusiness.private_room && !biz.private_room) return false;
 
+                // 推廣時段過濾
                 if (activePeriod !== 'all') {
                     if (!r.promotionPeriods || !r.promotionPeriods.includes(activePeriod)) return false;
                 }
@@ -3338,3 +3211,4 @@
 
 </body>
 </html>
+```
