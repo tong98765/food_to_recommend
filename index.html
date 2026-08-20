@@ -48,6 +48,8 @@
             font-weight: 700;
             color: #1A1A1A;
             letter-spacing: -0.3px;
+            cursor: pointer;
+            user-select: none;
         }
         .app-header .logo span {
             color: #007DFF;
@@ -78,6 +80,13 @@
         }
         .btn-primary:hover {
             background: #0066CC;
+        }
+        .btn-warning {
+            background: #FFC107 !important;
+            color: #fff !important;
+        }
+        .btn-warning:hover {
+            background: #E6A800 !important;
         }
         .btn-success {
             background: #2ED573;
@@ -1146,10 +1155,9 @@
                 z-index: 500 !important;
             }
 
-            /* 篩選欄開關按鈕 (總是顯示) */
             .filter-toggle-btn {
                 position: absolute;
-                top: 60px;  /* 放在摺疊地圖按鈕下方 */
+                top: 60px;
                 right: 12px;
                 width: 36px;
                 height: 36px;
@@ -1170,9 +1178,35 @@
                 transform: scale(1.05);
             }
 
-            /* 當篩選欄被隱藏時 */
             .app-body.filter-hidden .mobile-filter-bar {
                 display: none !important;
+            }
+
+            .pin-mode-btn {
+                position: absolute;
+                bottom: 90px;
+                right: 16px;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: #FFFFFF;
+                border: 1px solid rgba(0,0,0,0.06);
+                box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+                font-size: 20px;
+                color: #4A5A6A;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 500;
+            }
+            .pin-mode-btn.active {
+                background: #FFB800;
+                color: #fff;
+                border-color: #FFB800;
+            }
+            .pin-mode-btn:hover {
+                transform: scale(1.05);
             }
 
             .modal-overlay {
@@ -1284,6 +1318,32 @@
             .filter-toggle-btn {
                 display: none !important;
             }
+            .pin-mode-btn {
+                position: absolute;
+                bottom: 90px;
+                right: 20px;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: #FFFFFF;
+                border: 1px solid rgba(0,0,0,0.06);
+                box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+                font-size: 20px;
+                color: #4A5A6A;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 500;
+            }
+            .pin-mode-btn.active {
+                background: #FFB800;
+                color: #fff;
+                border-color: #FFB800;
+            }
+            .pin-mode-btn:hover {
+                transform: scale(1.05);
+            }
         }
 
         .text-muted {
@@ -1301,7 +1361,7 @@
     <!-- ===== 主應用 ===== -->
     <div id="app">
         <header class="app-header">
-            <div class="logo">🍜 <span>HW 飲食地圖</span></div>
+            <div class="logo" id="logoTitle">🍜 <span>HW 飲食地圖</span></div>
             <div class="header-actions">
                 <button class="btn btn-primary btn-sm" id="openAddBtn">＋ 新增</button>
             </div>
@@ -1389,7 +1449,9 @@
                 <div id="map"></div>
                 <div class="locate-status" id="locateStatus">📍 定位中...</div>
                 <button class="locate-btn" id="locateBtn" title="定位到我">📍</button>
-                <!-- 篩選欄開關按鈕 (總是顯示) -->
+                <!-- 圖釘模式按鈕 -->
+                <button class="pin-mode-btn" id="pinModeBtn" title="放置圖釘以新增地點">📌</button>
+                <!-- 篩選欄開關按鈕 -->
                 <button class="filter-toggle-btn" id="toggleFilterBtn" title="顯示/隱藏篩選">✕</button>
             </div>
 
@@ -1699,7 +1761,9 @@
             [22.56, 114.40]
         ];
 
-        const CUISINES = ['港式', '魯菜', '川菜', '粵菜', '台灣菜', '其他中菜', '日本菜', '韓國菜', '泰國菜', '海鮮', '西餐', '火鍋', '咖啡廳'];
+        const CUISINES = ['港式', '魯菜', '川菜', '粵菜', '台灣菜', '其他中菜', '日本菜', '韓國菜', '泰國菜', '海鮮', '西餐', '火鍋',
+            '咖啡廳'
+        ];
         const PERIODS = ['早餐', '中午', '下午茶', '晚餐', '宵夜'];
 
         // =============================================================
@@ -1976,6 +2040,8 @@
         let markersLayer = null;
         let userMarker = null;
         let geocodeMarker = null;
+        let tempPinMarker = null;
+        let pinModeActive = false;
         let activeDistrict = null;
         let activePrice = 'all';
         let activeStars = 'all';
@@ -1985,6 +2051,9 @@
 
         let currentPopupRestaurantId = null;
         let focusCommentOnOpen = false;
+
+        let logoClickCount = 0;
+        let hiddenModeActive = false;
 
         // =============================================================
         // 8. 初始化地圖
@@ -2018,7 +2087,9 @@
             setupBusinessFilters();
             setupPeriodFilters();
             document.getElementById('toggleMapBtn').addEventListener('click', toggleMap);
-            setupFilterToggle(); // 初始設定篩選欄開關按鈕
+            setupFilterToggle();
+            setupHiddenMode();
+            setupPinMode();
         }
 
         // =============================================================
@@ -2076,7 +2147,122 @@
         }
 
         // =============================================================
-        // 10. 自訂標記圖標
+        // 10. 隱藏模式
+        // =============================================================
+
+        function setupHiddenMode() {
+            const logo = document.getElementById('logoTitle');
+            if (!logo) return;
+            logo.addEventListener('click', function() {
+                logoClickCount++;
+                if (logoClickCount >= 10 && !hiddenModeActive) {
+                    activateHiddenMode();
+                }
+            });
+        }
+
+        function activateHiddenMode() {
+            hiddenModeActive = true;
+            console.log('🌟 隱藏模式已啟動：打卡地點');
+
+            const addBtn = document.getElementById('openAddBtn');
+            if (addBtn) {
+                addBtn.classList.remove('btn-primary');
+                addBtn.classList.add('btn-warning');
+            }
+
+            const selects = [
+                document.getElementById('cuisineSelectDesktop'),
+                document.getElementById('cuisineSelectMobile'),
+                document.getElementById('fCuisine')
+            ];
+
+            selects.forEach(select => {
+                if (select && !select.querySelector('option[value="打卡地點"]')) {
+                    const opt = document.createElement('option');
+                    opt.value = '打卡地點';
+                    opt.textContent = '打卡地點';
+                    select.appendChild(opt);
+                }
+            });
+
+            if (!CUISINES.includes('打卡地點')) {
+                CUISINES.push('打卡地點');
+            }
+        }
+
+        // =============================================================
+        // 11. 圖釘模式
+        // =============================================================
+
+        function setupPinMode() {
+            const pinBtn = document.getElementById('pinModeBtn');
+            if (!pinBtn) return;
+
+            pinBtn.addEventListener('click', function() {
+                pinModeActive = !pinModeActive;
+                pinBtn.classList.toggle('active', pinModeActive);
+                map.getContainer().style.cursor = pinModeActive ? 'crosshair' : '';
+                if (pinModeActive) {
+                    showStatus('📌 圖釘模式已開啟，點擊地圖放置圖釘', '');
+                } else {
+                    showStatus('📌 圖釘模式已關閉', '');
+                    if (tempPinMarker) {
+                        map.removeLayer(tempPinMarker);
+                        tempPinMarker = null;
+                    }
+                }
+            });
+
+            map.on('click', function(e) {
+                if (!pinModeActive) return;
+                placeTempPin(e.latlng);
+            });
+
+            // 全域事件委派：偵測圖釘彈窗中的「新增餐廳」按鈕
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'usePinLocationBtn') {
+                    if (tempPinMarker && window.openAddModalWithCoords) {
+                        const pos = tempPinMarker.getLatLng();
+                        window.openAddModalWithCoords(pos.lat, pos.lng);
+                    } else {
+                        console.error('tempPinMarker or openAddModalWithCoords not ready');
+                    }
+                }
+            });
+        }
+
+        function placeTempPin(latlng) {
+            if (tempPinMarker) {
+                map.removeLayer(tempPinMarker);
+            }
+            const icon = L.divIcon({
+                html: `<div style="background:#FF6B6B;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid white;box-shadow:0 2px 12px rgba(0,0,0,0.3);">📍</div>`,
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+            tempPinMarker = L.marker(latlng, { icon: icon, draggable: true }).addTo(map);
+
+            const popupContent = `
+                <div>
+                    <b>圖釘位置</b><br>
+                    緯度: <span id="pinLat">${latlng.lat.toFixed(6)}</span><br>
+                    經度: <span id="pinLng">${latlng.lng.toFixed(6)}</span><br>
+                    <button class="btn btn-sm btn-primary" id="usePinLocationBtn">➕ 新增餐廳</button>
+                </div>
+            `;
+            tempPinMarker.bindPopup(popupContent).openPopup();
+
+            tempPinMarker.on('dragend', function() {
+                const pos = tempPinMarker.getLatLng();
+                document.getElementById('pinLat').textContent = pos.lat.toFixed(6);
+                document.getElementById('pinLng').textContent = pos.lng.toFixed(6);
+            });
+        }
+
+        // =============================================================
+        // 12. 自訂標記圖標
         // =============================================================
 
         function createRestaurantIcon(color) {
@@ -2090,7 +2276,7 @@
         }
 
         // =============================================================
-        // 11. 構建彈窗內容
+        // 13. 構建彈窗內容
         // =============================================================
 
         function buildInfoWindowContent(r) {
@@ -2239,14 +2425,21 @@
             if (!restaurant || !restaurant.lat || !restaurant.lng) return;
             let targetMarker = null;
             markersLayer.eachLayer(layer => {
-                if (layer.getLatLng) {
-                    const latlng = layer.getLatLng();
-                    if (Math.abs(latlng.lat - restaurant.lat) < 0.0001 &&
-                        Math.abs(latlng.lng - restaurant.lng) < 0.0001) {
-                        targetMarker = layer;
-                    }
+                if (layer.options && layer.options.restaurantId === restaurantId) {
+                    targetMarker = layer;
                 }
             });
+            if (!targetMarker) {
+                markersLayer.eachLayer(layer => {
+                    if (layer.getLatLng) {
+                        const latlng = layer.getLatLng();
+                        if (Math.abs(latlng.lat - restaurant.lat) < 0.0001 &&
+                            Math.abs(latlng.lng - restaurant.lng) < 0.0001) {
+                            targetMarker = layer;
+                        }
+                    }
+                });
+            }
             if (targetMarker) {
                 map.setView([restaurant.lat, restaurant.lng], 14);
                 focusCommentOnOpen = focusComment;
@@ -2255,7 +2448,7 @@
         }
 
         // =============================================================
-        // 12. 渲染標記
+        // 14. 渲染標記
         // =============================================================
 
         function renderMarkers() {
@@ -2273,7 +2466,7 @@
                 if (!r.lat || !r.lng) return;
                 const color = PRICE_COLORS[r.price] || '#007DFF';
                 const icon = createRestaurantIcon(color);
-                const marker = L.marker([r.lat, r.lng], { icon: icon });
+                const marker = L.marker([r.lat, r.lng], { icon: icon, restaurantId: r.id });
                 const popupContent = buildInfoWindowContent(r);
                 marker.bindPopup(popupContent, { maxWidth: 320, minWidth: 280 });
                 marker.on('popupopen', function() {
@@ -2316,7 +2509,7 @@
         }
 
         // =============================================================
-        // 13. 過濾邏輯
+        // 15. 過濾邏輯
         // =============================================================
 
         function getFilteredRestaurants() {
@@ -2345,7 +2538,7 @@
         }
 
         // =============================================================
-        // 14. 側邊欄列表 (桌面)
+        // 16. 側邊欄列表 (桌面)
         // =============================================================
 
         function renderList(filtered) {
@@ -2412,7 +2605,7 @@
         }
 
         // =============================================================
-        // 15. 手機版列表 (與桌面同步)
+        // 17. 手機版列表
         // =============================================================
 
         function renderMobileList(filtered) {
@@ -2479,7 +2672,7 @@
         }
 
         // =============================================================
-        // 16. 地區按鈕
+        // 18. 地區按鈕
         // =============================================================
 
         function renderDistrictButtons() {
@@ -2541,7 +2734,7 @@
         }
 
         // =============================================================
-        // 17. 價格與星級篩選
+        // 19. 價格與星級篩選
         // =============================================================
 
         function setupFilters() {
@@ -2604,7 +2797,7 @@
         }
 
         // =============================================================
-        // 18. 品類下拉選單
+        // 20. 品類下拉選單
         // =============================================================
 
         function setupCuisineFilters() {
@@ -2626,7 +2819,7 @@
         }
 
         // =============================================================
-        // 19. 適合談生意篩選按鈕
+        // 21. 適合談生意篩選
         // =============================================================
 
         function setupBusinessFilters() {
@@ -2658,7 +2851,7 @@
         }
 
         // =============================================================
-        // 20. 推廣時段篩選
+        // 22. 推廣時段篩選
         // =============================================================
 
         function setupPeriodFilters() {
@@ -2680,7 +2873,7 @@
         }
 
         // =============================================================
-        // 21. 地圖折疊/展開功能
+        // 23. 地圖折疊/展開
         // =============================================================
 
         function toggleMap() {
@@ -2706,7 +2899,7 @@
         }
 
         // =============================================================
-        // 22. 篩選欄開關 (手機版) - 使用單一按鈕切換
+        // 24. 篩選欄開關 (手機版)
         // =============================================================
 
         function setupFilterToggle() {
@@ -2716,29 +2909,25 @@
 
             if (!closeFilterBtn || !toggleFilterBtn) return;
 
-            // 初始狀態：篩選欄可見，按鈕顯示關閉圖示
             toggleFilterBtn.textContent = '✕';
 
             function toggleFilter() {
                 const isHidden = appBody.classList.toggle('filter-hidden');
-                // 更新按鈕圖示
                 toggleFilterBtn.textContent = isHidden ? '🔍' : '✕';
                 setTimeout(() => { if (map) map.invalidateSize(); }, 400);
             }
 
-            // 篩選欄內的關閉按鈕
             closeFilterBtn.addEventListener('click', function() {
                 appBody.classList.add('filter-hidden');
                 toggleFilterBtn.textContent = '🔍';
                 setTimeout(() => { if (map) map.invalidateSize(); }, 400);
             });
 
-            // 地圖上的切換按鈕
             toggleFilterBtn.addEventListener('click', toggleFilter);
         }
 
         // =============================================================
-        // 23. 地址定位功能
+        // 25. 地址定位功能
         // =============================================================
 
         async function searchAddressAndGetCoordinates(address, targetDistrict) {
@@ -2811,7 +3000,7 @@
         }
 
         // =============================================================
-        // 24. 新增餐廳
+        // 26. 新增餐廳表單 (含圖釘座標預填)
         // =============================================================
 
         function setupAddForm() {
@@ -2871,6 +3060,10 @@
                     map.removeLayer(geocodeMarker);
                     geocodeMarker = null;
                 }
+                if (tempPinMarker) {
+                    map.removeLayer(tempPinMarker);
+                    tempPinMarker = null;
+                }
                 geocodeStatus.textContent = '💡 提交時會自動嘗試定位地址';
                 geocodeStatus.className = 'geocode-status';
                 const submitBtn = form.querySelector('button[type="submit"]');
@@ -2879,7 +3072,7 @@
                 lngInput.value = '';
             }
 
-            openBtn.addEventListener('click', () => {
+            function openModal(initialLat, initialLng) {
                 modal.classList.add('open');
                 if (activeDistrict && activeDistrict !== 'other') {
                     districtSelect.value = activeDistrict;
@@ -2901,8 +3094,21 @@
                 }
                 geocodeStatus.textContent = '💡 提交時會自動嘗試定位地址';
                 geocodeStatus.className = 'geocode-status';
-                latInput.value = '';
-                lngInput.value = '';
+                if (initialLat !== undefined && initialLng !== undefined) {
+                    latInput.value = initialLat.toFixed(6);
+                    lngInput.value = initialLng.toFixed(6);
+                } else {
+                    latInput.value = '';
+                    lngInput.value = '';
+                }
+            }
+
+            function openAddModalWithCoords(lat, lng) {
+                openModal(lat, lng);
+            }
+
+            openBtn.addEventListener('click', () => {
+                openModal();
             });
 
             closeBtn.addEventListener('click', closeModal);
@@ -2910,6 +3116,8 @@
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) closeModal();
             });
+
+            window.openAddModalWithCoords = openAddModalWithCoords;
 
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -3094,7 +3302,10 @@
                             syncMobileDistrict('other');
                         }
                         renderMarkers();
-                        setTimeout(() => alert('✅ 餐廳已新增！'), 300);
+                        // 自動開啟新餐廳的資訊窗
+                        setTimeout(() => {
+                            openPopupForRestaurant(newRestaurant.id, false);
+                        }, 300);
                     } else {
                         restaurants.pop();
                         alert('❌ 儲存失敗，請稍後再試');
@@ -3111,7 +3322,7 @@
         }
 
         // =============================================================
-        // 25. 啟動
+        // 27. 啟動
         // =============================================================
 
         document.addEventListener('DOMContentLoaded', function() {
