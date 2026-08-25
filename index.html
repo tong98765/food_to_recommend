@@ -2747,6 +2747,7 @@
                 const isDeleteRequest = text.toLowerCase() === 'closed' && 
                                         recommender.toLowerCase() === 'admin';
                 
+                // 刪除餐廳
                 if (isDeleteRequest) {
                     if (password !== STATIC_PASSWORD) {
                         errorDiv.textContent = '❌ 密碼錯誤，無法刪除';
@@ -2757,39 +2758,19 @@
                         return;
                     }
                     
-                    const confirmDelete = confirm('⚠️ 確定要刪除這間餐廳嗎？');
-                    if (!confirmDelete) {
-                        newBtn.disabled = false;
-                        newBtn.textContent = '提交評論';
-                        return;
-                    }
+                    const success = await safeDeleteRestaurant(restaurantId);
                     
-                    try {
-                        const index = restaurants.findIndex(r => r.id === restaurantId);
-                        if (index !== -1) {
-                            restaurants.splice(index, 1);
-                        }
-                        
-                        await signInAnonymously(auth);
-                        await saveRestaurants(restaurants);
-                        await signOut(auth);
-                        
+                    if (success) {
                         map.closePopup();
                         renderMarkers();
-                        
                         alert('✅ 餐廳已刪除！');
-                        
-                        pwdInput.value = '';
-                        textarea.value = '';
-                        recommenderInput.value = '';
-                        
-                    } catch (error) {
-                        console.error('刪除失敗:', error);
-                        errorDiv.textContent = '❌ 刪除失敗';
-                        errorDiv.style.display = 'block';
-                        newBtn.disabled = false;
-                        newBtn.textContent = '提交評論';
                     }
+                    
+                    pwdInput.value = '';
+                    textarea.value = '';
+                    recommenderInput.value = '';
+                    newBtn.disabled = false;
+                    newBtn.textContent = '提交評論';
                     return;
                 }
                 
@@ -4082,8 +4063,109 @@
             });      
         }  
         // =============================================================
-        // 26.5. 新增餐廳表單 (含圖釘座標預填)
+        // 26.5. delete restaurant
         // =============================================================
+        async function deleteRestaurantFromFirebase(restaurantId) {
+            try {
+                const snapshot = await getDocs(collection(db, RESTAURANTS_COLLECTION));
+                
+                // 找到對應的 doc ID
+                let docToDelete = null;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.id === restaurantId) {
+                        docToDelete = doc.id;
+                    }
+                });
+                
+                if (docToDelete) {
+                    await deleteDoc(doc(db, RESTAURANTS_COLLECTION, docToDelete));
+                    console.log('✅ Firebase 刪除成功:', docToDelete);
+                } else {
+                    // 如果找不到單一 doc，使用批次方式
+                    await saveRestaurants(restaurants);
+                }
+            } catch (error) {
+                console.error('Firebase 刪除失敗:', error);
+                throw error;
+            }
+        }
+        function confirmDeleteRestaurant(restaurantName) {
+            const confirmMessage = `⚠️ 確定要刪除「${restaurantName}」嗎？\n\n` +
+                                `此操作無法復原！\n\n` +
+                                `請輸入餐廳名稱確認：`;
+            
+            const userInput = prompt(confirmMessage);
+            
+            if (userInput === null) {
+                alert('已取消刪除');
+                return false;
+            }
+            
+            if (userInput.trim() !== restaurantName) {
+                alert('❌ 餐廳名稱不符，已取消刪除');
+                return false;
+            }
+            
+            return true;
+        }
+        async function safeDeleteRestaurant(restaurantId) {
+            try {
+                // 找到餐廳
+                const restaurantToDelete = restaurants.find(r => r.id === restaurantId);
+                if (!restaurantToDelete) {
+                    throw new Error('餐廳不存在');
+                }
+                
+                // 確認刪除
+                const confirmed = confirmDeleteRestaurant(restaurantToDelete.name);
+                if (!confirmed) {
+                    return false;
+                }
+                
+                // 記錄刪除前的數量
+                const beforeCount = restaurants.length;
+                console.log(`🔍 刪除前餐廳數: ${beforeCount}`);
+                
+                // 只移除一筆
+                const index = restaurants.findIndex(r => r.id === restaurantId);
+                restaurants.splice(index, 1);
+                
+                // 驗證只刪除一筆
+                const afterCount = restaurants.length;
+                if (afterCount !== beforeCount - 1) {
+                    throw new Error('刪除數量不正確，預期刪除1筆');
+                }
+                
+                console.log(`✅ 刪除後餐廳數: ${afterCount}`);
+                
+                // 儲存到 Firebase
+                await signInAnonymously(auth);
+                const result = await saveRestaurants(restaurants);
+                await signOut(auth);
+                
+                if (!result) {
+                    throw new Error('儲存失敗');
+                }
+                
+                // 更新 localStorage
+                localStorage.setItem('hk_restaurants', JSON.stringify(restaurants));
+                
+                return true;
+                
+            } catch (error) {
+                console.error('❌ 刪除失敗:', error);
+                
+                // 重新載入資料以恢復狀態
+                const data = await loadRestaurants();
+                restaurants = data;
+                renderMarkers();
+                
+                alert('❌ 刪除失敗，資料已恢復');
+                return false;
+            }
+        }
+
         // ==================================================
         // 27. 啟動
         // =============================================================
@@ -4111,6 +4193,5 @@
         window.getFilteredRestaurants = getFilteredRestaurants;
         window.setupBusinessFilters = setupBusinessFilters;
     </script>
-
 </body>
 </html>
